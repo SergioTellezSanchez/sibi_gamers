@@ -1,0 +1,40 @@
+---
+import { GRADIENTS } from "../data/games";
+import Tag from "./Tag.astro";
+
+interface Props {
+  title: string;
+  game: string;
+  summary: string;
+  type: string;
+  difficulty: string;
+  readTime: string;
+  updated: string;
+  index: number;
+}
+
+const { title, game, summary, type, difficulty, readTime, updated, index } = Astro.props;
+---
+
+<article class="guide-card" data-reveal-item data-hover-lift data-filter-value={type}>
+  <span
+    class="guide-card__rule"
+    style={`background:${GRADIENTS[index % GRADIENTS.length]}`}
+    aria-hidden="true"></span>
+
+  <div class="guide-card__body">
+    <div class="guide-card__game">{game}</div>
+    <h3 class="guide-card__title"><a href="#">{title}</a></h3>
+    <p class="guide-card__summary">{summary}</p>
+
+    <div class="guide-card__tags">
+      <Tag tone="accent">{type}</Tag>
+      <Tag>{difficulty}</Tag>
+    </div>
+
+    <div class="guide-card__footer">
+      <span class="byline__date">{updated}</span>
+      <span class="guide-card__time">{readTime}</span>
+    </div>
+  </div>
+</article>

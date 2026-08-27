@@ -1,0 +1,133 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import FilterBar from "../../components/FilterBar.astro";
+import LeadFeature from "../../components/LeadFeature.astro";
+import GuideCard from "../../components/GuideCard.astro";
+import Tag from "../../components/Tag.astro";
+import { GRADIENTS } from "../../data/games";
+
+const all = await getCollection("guides");
+const lead = all.find((g) => g.data.lead);
+const rest = all
+  .filter((g) => !g.data.lead)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const TYPES = [
+  "All",
+  "Beginner",
+  "Walkthrough",
+  "Builds",
+  "Collectibles",
+  "Endgame",
+] as const;
+
+const POPULAR = [
+  { title: "Ashen Trials: stat priorities cheat sheet", views: "184k" },
+  { title: "Hollow Vector: relic tier list, season 3", views: "142k" },
+  { title: "Driftbound: the ten-minute setup guide", views: "97k" },
+  { title: "Loam: crop profit table, year one", views: "88k" },
+  { title: "Cinder Watch: all silent takedown tools", views: "71k" },
+];
+---
+
+<Base
+  title="Guides — Sibi Gamers"
+  description="Deep game guides written by people who finished the game, for people who intend to."
+>
+  <PageHeader
+    title="Guides"
+    subtitle="Written by people who finished the game, for people who intend to."
+    meta={`${all.length} guides`}
+  />
+
+  {
+    lead && (
+      <LeadFeature badge="Start here" cover={GRADIENTS[1]}>
+        <div class="lead__meta">
+          <Tag tone="accent">{lead.data.type}</Tag>
+          <Tag>{lead.data.difficulty}</Tag>
+          <Tag>{lead.data.readTime}</Tag>
+        </div>
+
+        <div class="guide-card__game">{lead.data.game}</div>
+        <h2 class="lead__title">
+          <a href="#">{lead.data.title}</a>
+        </h2>
+        <p class="lead__excerpt">{lead.data.summary}</p>
+
+        {lead.data.chapters && (
+          <ol class="chapters">
+            {lead.data.chapters.map((chapter, i) => (
+              <li class="chapters__item">
+                <span class="chapters__num">{String(i + 1).padStart(2, "0")}</span>
+                <a href="#" class="chapters__link">
+                  {chapter}
+                </a>
+              </li>
+            ))}
+          </ol>
+        )}
+
+        <div class="byline">
+          <span class="byline__name">{lead.data.author}</span>
+          <span class="byline__date">{lead.data.updated}</span>
+        </div>
+      </LeadFeature>
+    )
+  }
+
+  <FilterBar label="Filter by type" group="guides" items={TYPES} />
+
+  <div class="with-rail">
+    <div>
+      <div
+        class="guide-grid"
+        data-reveal
+        data-reveal-stagger="0.06"
+        data-filter-group="guides"
+      >
+        {
+          rest.map((guide, i) => (
+            <GuideCard
+              title={guide.data.title}
+              game={guide.data.game}
+              summary={guide.data.summary}
+              type={guide.data.type}
+              difficulty={guide.data.difficulty}
+              readTime={guide.data.readTime}
+              updated={guide.data.updated}
+              index={i}
+            />
+          ))
+        }
+      </div>
+
+      <p class="empty" data-filter-empty="guides" hidden>No guides of this type yet.</p>
+    </div>
+
+    <aside class="rail">
+      <h2 class="rail__heading eyebrow">Popular this week</h2>
+      <ol class="rail__list">
+        {
+          POPULAR.map((item, i) => (
+            <li class="rail__item">
+              <span class="rail__num">{String(i + 1).padStart(2, "0")}</span>
+              <span>
+                <a href="#" class="rail__link">
+                  {item.title}
+                </a>
+                <span class="rail__sub">{item.views} reads</span>
+              </span>
+            </li>
+          ))
+        }
+      </ol>
+    </aside>
+  </div>
+</Base>
+
+<script>
+  import "../../scripts/filters";
+</script>

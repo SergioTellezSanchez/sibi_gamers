@@ -1,0 +1,20 @@
+---
+import { scoreColor } from "../ds/scoreColor";
+
+interface Props {
+  score: number;
+  size?: "hero" | "card" | "row";
+  sourceCount?: number;
+  /** Count up from zero when scrolled into view (design system §motion). */
+  countUp?: boolean;
+}
+
+const { score, size = "card", sourceCount, countUp = true } = Astro.props;
+const value = Math.round(score);
+---
+
+<div class={`score score--${size}`} style={`color:${scoreColor(score)}`}>
+  <div class="score__value" data-count={countUp ? value : undefined}>{value}</div>
+  <div class="score__rule"></div>
+  {sourceCount != null && <div class="score__caption">based on {sourceCount} sources</div>}
+</div>

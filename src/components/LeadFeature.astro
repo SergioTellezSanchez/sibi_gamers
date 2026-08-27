@@ -1,0 +1,28 @@
+---
+/**
+ * The stacked-ember lead block shared by Reviews, News and Guides: two offset
+ * plates behind a card face, cover panel on the left, content on the right.
+ */
+interface Props {
+  badge: string;
+  cover: string;
+  wide?: boolean;
+}
+
+const { badge, cover, wide = false } = Astro.props;
+---
+
+<article class={`lead${wide ? " lead--wide" : ""}`} data-reveal data-reveal-stagger="0.06">
+  <span class="lead__layer lead__layer--back"></span>
+  <span class="lead__layer lead__layer--mid"></span>
+
+  <div class="lead__face" data-reveal-item>
+    <div class="lead__cover" style={`background:${cover}`} aria-hidden="true">
+      <span class="lead__badge">{badge}</span>
+    </div>
+
+    <div class="lead__body">
+      <slot />
+    </div>
+  </div>
+</article>

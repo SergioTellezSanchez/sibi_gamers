@@ -1,0 +1,38 @@
+---
+interface Props {
+  /** Label shown before the pills. */
+  label: string;
+  /** Matches `data-filter-group` on the list this bar controls. */
+  group: string;
+  items: readonly string[];
+  selected?: string;
+}
+
+const { label, group, items, selected = items[0] } = Astro.props;
+---
+
+{/*
+  Filtering is a class toggle over server-rendered cards, not a re-render.
+  Every card ships in the HTML, so crawlers see the whole catalogue rather
+  than whichever subset the default filter happens to select.
+*/}
+<div class="filter-bar">
+  <div class="eyebrow">{label}</div>
+  <div class="pill-group pill-group--start" role="group" aria-label={label} data-filter-for={group}>
+    {
+      items.map((item) => (
+        <button
+          type="button"
+          class="pill"
+          aria-pressed={item === selected}
+          data-filter={item}
+        >
+          <span class="pill__wash pill__wash--1" />
+          <span class="pill__wash pill__wash--2" />
+          <span class="pill__wash pill__wash--3" />
+          <span class="pill__label">{item}</span>
+        </button>
+      ))
+    }
+  </div>
+</div>

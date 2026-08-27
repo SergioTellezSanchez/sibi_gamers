@@ -1,0 +1,107 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import FilterBar from "../../components/FilterBar.astro";
+import LeadFeature from "../../components/LeadFeature.astro";
+import ReviewCard from "../../components/ReviewCard.astro";
+import ScoreDisplay from "../../components/ScoreDisplay.astro";
+import Tag from "../../components/Tag.astro";
+import { GRADIENTS } from "../../data/games";
+
+const all = await getCollection("reviews");
+const lead = all.find((r) => r.data.lead);
+const rest = all
+  .filter((r) => !r.data.lead)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const FILTERS = ["All", "Acclaimed", "Recommended", "Mixed", "Panned"] as const;
+
+// Pill label -> the score bands it accepts. Bands come from the design
+// system's scoreBand(), so the filter can never drift from the colours.
+const BAND_MAP = {
+  Acclaimed: ["top"],
+  Recommended: ["high"],
+  Mixed: ["mid"],
+  Panned: ["low"],
+};
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+---
+
+<Base
+  title="Reviews — Sibi Gamers"
+  description="Every game we score, in full. One critic, one verdict, one number."
+>
+  <PageHeader
+    title="Reviews"
+    subtitle="Every game we score, in full. One critic, one verdict, one number."
+    meta={`${all.length} reviews`}
+  />
+
+  {
+    lead && (
+      <LeadFeature badge="Review of the week" cover={GRADIENTS[0]}>
+        <div class="lead__meta">
+          <Tag tone="accent">{lead.data.genre}</Tag>
+          {lead.data.platforms.map((p) => (
+            <Tag>{p}</Tag>
+          ))}
+        </div>
+
+        <h2 class="lead__title">
+          <a href="#">{lead.data.title}</a>
+        </h2>
+        <p class="lead__verdict">{lead.data.verdict}</p>
+        <p class="lead__excerpt">{lead.body}</p>
+
+        <div class="lead__footer">
+          <div class="byline">
+            <span class="byline__name">{lead.data.critic}</span>
+            <span class="byline__date">
+              {fmt(lead.data.date)} · {lead.data.studio} · {lead.data.hours}
+            </span>
+          </div>
+          <ScoreDisplay
+            score={lead.data.score}
+            size="hero"
+            sourceCount={lead.data.sourceCount}
+          />
+        </div>
+      </LeadFeature>
+    )
+  }
+
+  <FilterBar label="Filter by score" group="reviews" items={FILTERS} />
+
+  <div
+    class="review-grid"
+    data-reveal
+    data-reveal-stagger="0.06"
+    data-filter-group="reviews"
+    data-filter-map={JSON.stringify(BAND_MAP)}
+  >
+    {
+      rest.map((review, i) => (
+        <ReviewCard
+          title={review.data.title}
+          score={review.data.score}
+          verdict={review.data.verdict}
+          excerpt={review.body ?? ""}
+          critic={review.data.critic}
+          date={fmt(review.data.date)}
+          genre={review.data.genre}
+          platforms={review.data.platforms}
+          index={i}
+        />
+      ))
+    }
+  </div>
+
+  <p class="empty" data-filter-empty="reviews" hidden>No reviews in this band yet.</p>
+</Base>
+
+<script>
+  import "../../scripts/filters";
+</script>

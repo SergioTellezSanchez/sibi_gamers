@@ -1,0 +1,114 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import FilterBar from "../../components/FilterBar.astro";
+import LeadFeature from "../../components/LeadFeature.astro";
+import StoryRow from "../../components/StoryRow.astro";
+import Tag from "../../components/Tag.astro";
+import { GRADIENTS } from "../../data/games";
+
+const all = await getCollection("news");
+const lead = all.find((n) => n.data.lead);
+const stories = all
+  .filter((n) => !n.data.lead)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const CATEGORIES = ["All", "Industry", "Releases", "Patches", "Esports"] as const;
+const BUCKETS = ["Today", "Yesterday", "Earlier this week"] as const;
+
+const TRENDING = [
+  "Ashen Trials review roundup: the year's highest aggregate",
+  "Every Driftbound season two track, ranked",
+  "Why Static Fields' demo strategy worked",
+  "The Cinder Watch Switch delay, explained",
+  "Loam's four-day week, one year on",
+];
+---
+
+<Base
+  title="News — Sibi Gamers"
+  description="What happened in games, who said it, and whether it matters."
+>
+  <PageHeader
+    title="News"
+    subtitle="What happened, who said it, and whether it matters."
+    meta="Updated continuously"
+  />
+
+  {
+    lead && (
+      <LeadFeature badge="Exclusive" cover={GRADIENTS[3]} wide>
+        <div class="lead__meta">
+          <Tag tone="accent">{lead.data.category}</Tag>
+          <span class="story__source">{lead.data.source}</span>
+        </div>
+
+        <h2 class="lead__title">
+          <a href="#">{lead.data.headline}</a>
+        </h2>
+        <p class="lead__excerpt">{lead.data.standfirst}</p>
+
+        <div class="byline">
+          <span class="byline__name">{lead.data.byline}</span>
+          <span class="byline__date">{lead.data.displayDate}</span>
+        </div>
+      </LeadFeature>
+    )
+  }
+
+  <FilterBar label="Filter by topic" group="news" items={CATEGORIES} />
+
+  <div class="with-rail">
+    <div class="feed" data-reveal data-reveal-stagger="0.05" data-filter-group="news">
+      {
+        BUCKETS.map((bucket) => {
+          const inBucket = stories.filter((s) => s.data.bucket === bucket);
+          if (!inBucket.length) return null;
+
+          return (
+            <section class="feed-group" data-filter-section>
+              <h2 class="feed-group__heading eyebrow">{bucket}</h2>
+              <ul class="list">
+                {inBucket.map((story, i) => (
+                  <StoryRow
+                    headline={story.data.headline}
+                    standfirst={story.data.standfirst}
+                    source={story.data.source}
+                    category={story.data.category}
+                    displayDate={story.data.displayDate}
+                    index={i}
+                  />
+                ))}
+              </ul>
+            </section>
+          );
+        })
+      }
+
+      <p class="empty" data-filter-empty="news" hidden>
+        Nothing filed under this topic today.
+      </p>
+    </div>
+
+    <aside class="rail">
+      <h2 class="rail__heading eyebrow">Trending</h2>
+      <ol class="rail__list">
+        {
+          TRENDING.map((item, i) => (
+            <li class="rail__item">
+              <span class="rail__num">{String(i + 1).padStart(2, "0")}</span>
+              <a href="#" class="rail__link">
+                {item}
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </aside>
+  </div>
+</Base>
+
+<script>
+  import "../../scripts/filters";
+</script>

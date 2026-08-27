@@ -1,0 +1,407 @@
+# SIBI GAMERS — Documento Maestro del Proyecto
+
+> Última actualización: 3 de agosto de 2026
+> Este documento se actualiza al final de cada sesión de trabajo.
+> Vive en la raíz del repo y es la única fuente de verdad del proyecto.
+
+---
+
+## 1. La marca
+
+- **Nombre:** Sibi Gamers
+- **Significado:** *Sibi* = fuego, lumbre en jñatjo (mazahua), la lengua de la comunidad de Yeyo. En la cosmovisión mazahua el fuego es uno de los elementos venerados del universo.
+- **Historia de marca (para el About):** fundado por Yeyo, gamer mazahua de México. El nombre honra sus raíces: el sitio es una fogata (gosivi) donde los gamers se reúnen a compartir.
+- **Idioma del sitio:** inglés
+- **Pendiente:** verificar dominios (sibigamers.gg, sibigamers.com, playsibi.com, sibi.gg) y handles de redes sociales. Consultar con hablantes de la comunidad los matices de la palabra *sibi* en la variante local.
+
+## 2. Concepto del portal
+
+Portal de videojuegos con tres pilares de contenido y un diferenciador central:
+
+1. **Rankings con score agregado (sección principal):** como albumoftheyear.org pero de videojuegos. Se toman calificaciones de tantas fuentes como sea posible y se agregan en un score 0–100 por juego, con transparencia de fuentes ("based on N sources").
+2. **Noticias** (automatizadas/asistidas con Claude).
+3. **Reseñas y guías**, con guías profundas de juegos importantes (hueco que GameFAQs deja descubierto).
+
+**Diferenciadores:**
+- Imágenes de juegos y noticias descargables en alta calidad (feature central, no accesorio).
+- Recomendador con IA: el usuario describe qué quiere jugar en lenguaje natural y recibe 5 recomendaciones enlazadas a sus páginas de juego.
+- Marca con identidad cultural real (jñatjo/mazahua).
+
+## 3. Identidad visual
+
+**Vibe:** oscuro editorial (tipo AOTY/Backloggd), sofisticado, data-driven. Ni neón gamer ni retro.
+
+**Paleta (el fuego de Sibi):**
+
+| Hex | Nombre | Uso |
+|---|---|---|
+| #03071E | Ink Black | Fondo principal |
+| #370617 | Night Bordeaux | Superficies secundarias / cards |
+| #6A040F | Black Cherry | Bordes, hovers |
+| #9D0208 | Oxblood | Scores 0–49 |
+| #D00000 | Brick Ember | Scores 0–49, alertas |
+| #DC2F02 | Red Ochre | Scores 50–69 |
+| #E85D04 | Cayenne Red | Scores 50–69, CTAs secundarios |
+| #F48C06 | Deep Saffron | Scores 70–84, links |
+| #FAA307 | Orange | Scores 85–100 |
+| #FFBA08 | Amber Flame | Scores 85–100, CTA primario, marca |
+
+**Decisiones de diseño tomadas:**
+- Score: número grande 0–100 coloreado según la paleta (rojo = malo → ámbar = excelente).
+- Home dominada por el ranking: top 3 en cards grandes con portada, posiciones 4–20 en tabla densa editorial.
+- Tipografía: display bold en títulos, sans moderna en texto y tablas.
+- Columna secundaria: Latest News + Recent Reviews.
+- Banda destacando "Download all game art & screenshots in high quality".
+
+## 4. Roadmap
+
+### Fase 1 — Definición y validación (en curso)
+- [x] Concepto, secciones y diferenciadores
+- [x] Nombre: Sibi Gamers
+- [x] Paleta de colores y dirección visual
+- [ ] Verificar dominio y redes sociales
+- [ ] **Investigación de oportunidades:** pasar una tarde en OpenCritic y Backloggd anotando qué funciona y qué estorba; completar la lista de "cosas que nadie hace" (sección 7)
+- [ ] Definir fuentes de datos para el score agregado (críticos, tiendas, comunidad) y una metodología transparente
+
+### Fase 2 — Diseño (Claude Design)
+- [x] **Design system** (logo de flama geométrica estilo bordado mazahua, tokens, tipografía, componentes, motion GSAP) — completado
+- [x] Homepage — completada (top 3 + tabla 4-20 con metadata rica, recomendador, noticias, reviews, banda de descargas)
+- [ ] **Página de detalle de juego (siguiente): prompt en sección 8c** — va por el flujo Design→Code, NO se diseña en código
+- [ ] Plantilla de artículo (noticia/reseña/guía)
+- [ ] Módulo del recomendador IA
+
+### Fase 3 — Desarrollo (Claude Code)
+- [x] **Stack decidido: Astro + islas React + GSAP** (ver §11 y registro de decisiones)
+- [x] Homepage implementada sobre el design system
+- [x] Índices de Reviews / News / Guides — **construidos code-first**, no pasaron por Claude Design. Consumen estrictamente los tokens y componentes de `src/ds/`. Se pueden empujar a Claude Design vía `/design-sync` para pulido visual si hace falta.
+- [x] Contenido editorial en Markdown (content collections de Astro)
+- [x] Sistema de motion completo según §8b (count-up al entrar en viewport, barra que se expande en hover, flicker del logomark)
+- [ ] Adapter de deploy (Vercel/Netlify) para habilitar rutas SSR
+- [ ] Endpoint `/api/recommend` con la API de Claude (reservado, requiere adapter)
+- [ ] Página de detalle de juego (cuando llegue el diseño de Fase 2)
+- [ ] Base de datos de juegos alimentada por APIs (RAWG, IGDB) para metadata e imágenes
+- [ ] Sistema de score agregado
+- [ ] Pipeline de contenido automatizado con Claude (noticias/borradores)
+
+### Fase 4 — Contenido inicial
+- [ ] 5–10 piezas antes del lanzamiento: 2–3 reseñas, noticias, 1 guía profunda
+- [ ] Ritmo sostenible: 2–3 publicaciones por semana
+
+### Fase 5 — Lanzamiento
+- [ ] Dominio conectado, prueba móvil, analytics (Plausible o GA)
+- [ ] Compartir en redes, Discords y comunidades
+
+### Fase 6 — Crecimiento
+- [ ] Publicación consistente; medir qué funciona
+- [ ] Activar afiliados; ads solo cuando haya tráfico
+- [ ] Nuevas features según datos, no impulsos
+
+**Principio rector: lanzar mínimo y vivo antes que perfecto y guardado.**
+
+## 5. Monetización
+
+- **Afiliados de tiendas (motor principal):** Green Man Gaming, Fanatical, Humble Bundle Partner, CDKeys, Instant Gaming. Botones "Buy on…" en cada página de juego (modelo OpenCritic).
+- **Amazon Associates:** ediciones físicas, consolas, accesorios; ideal en guías ("best controllers for…").
+- **Display ads (después):** AdSense al inicio si acaso; Mediavine/Raptive cuando haya decenas de miles de sesiones mensuales. No ensuciar el diseño el día uno.
+- La página de juego (score + botones de compra) es la máquina de ingresos; noticias y guías son el tráfico que la alimenta.
+
+## 6. Sitios de referencia (dónde buscar ideas)
+
+**Agregadores de score (competencia directa):**
+- Metacritic — metacritic.com — el estándar del score 0–100 con color; aprender de su claridad, evitar su opacidad metodológica
+- OpenCritic — opencritic.com — transparencia de fuentes y botones de compra afiliados; el más cercano a nuestro modelo
+
+**Comunidad y catálogo:**
+- Backloggd — backloggd.com — estética oscura editorial, listas y perfiles; "Letterboxd de videojuegos"
+- HowLongToBeat — howlongtobeat.com — ejemplo de un solo dato bien ejecutado sosteniendo un sitio
+- RAWG — rawg.io — base de datos con API pública (candidata a fuente de datos)
+- IGDB — igdb.com — ídem, API de Twitch
+
+**Editorial:**
+- IGN — ign.com — portal completo: noticias + reseñas + guías
+- GameSpot — gamespot.com — similar, buen manejo de video
+- Polygon — polygon.com — voz editorial y de autor
+- Eurogamer — eurogamer.net — periodismo de juegos europeo
+- GameFAQs — gamefaqs.gamespot.com — domina guías, pero sin profundidad en juegos importantes (nuestro hueco)
+
+**Inspiración de diseño:**
+- albumoftheyear.org — el modelo original: densidad editorial, scores con color, rankings anuales
+
+**A vigilar:**
+- games.gg — competidor grande de descubrimiento con IA (y la razón por la que descartamos nombres tipo "gamers.gg")
+
+## 7. Investigación: cosas que nadie está haciendo (primera tarea)
+
+Hipótesis a validar mirando los sitios de la sección 6:
+
+- [ ] Score agregado + alma editorial + comunidad en un solo sitio (nadie combina las tres)
+- [ ] Imágenes oficiales en alta calidad, descargables y organizadas por juego
+- [ ] Recomendaciones por intención en lenguaje natural ("algo como Hades pero más relajado")
+- [ ] Guías profundas de juegos grandes con estándar editorial (vs. wikis caóticas)
+- [ ] Rankings anuales vivos tipo AOTY ("Best Games of 2026" que se actualiza todo el año)
+- [ ] Transparencia total de metodología del score (pesos y fuentes públicos)
+- [ ] Añadir aquí lo que descubras en la investigación…
+
+## 8. Prompt para Claude Design (homepage)
+
+```
+Design the homepage for "Sibi Gamers", a video game portal focused on aggregated
+game ratings (think albumoftheyear.org but for video games), plus news, reviews,
+and guides. "Sibi" means fire in Jñatjo (Mazahua), an indigenous language of
+Mexico — the whole visual identity is built on fire: from ink black darkness to
+ember reds to amber flame.
+
+VISUAL DIRECTION
+Dark editorial aesthetic: sophisticated, content-first, data-driven. Not
+neon-gamer, not retro. Think a premium music/film criticism site adapted to gaming.
+
+COLOR PALETTE (use exactly these)
+- Ink Black #03071E — main background
+- Night Bordeaux #370617 — secondary surfaces / cards
+- Black Cherry #6A040F — subtle accents, borders, hover states
+- Oxblood #9D0208 and Brick Ember #D00000 — low scores, alerts
+- Red Ochre #DC2F02 and Cayenne Red #E85D04 — mid scores, secondary CTAs
+- Deep Saffron #F48C06 — high scores, links
+- Orange #FAA307 and Amber Flame #FFBA08 — top scores, primary CTA, brand highlights
+Text: near-white on dark backgrounds, warm gray for secondary text.
+
+TYPOGRAPHY
+Bold display typeface for headlines and game titles; clean modern sans-serif for
+body text, tables, and UI. Strong typographic hierarchy.
+
+SCORE SYSTEM (core identity of the site)
+Every game shows a large 0–100 numeric score. The number's color maps to the palette:
+- 0–49: Oxblood/Brick Ember reds
+- 50–69: Red Ochre/Cayenne
+- 70–84: Deep Saffron
+- 85–100: Amber Flame
+Scores are aggregated from multiple external sources; show a small "based on N
+sources" label under each score.
+
+HOMEPAGE STRUCTURE (ranking is the protagonist)
+1. Slim top navigation: Sibi Gamers logo (wordmark, consider a subtle flame motif),
+   sections: Rankings, Reviews, News, Guides. Search bar.
+2. Hero section: "Best Games of 2026" — the TOP 3 games as large cards with cover
+   art, big colored score, title, platforms, and genre tags.
+3. Below: ranked table (positions 4–20) in dense editorial style: rank number,
+   small cover thumbnail, title, release date, platforms, colored score aligned
+   right. Rows with subtle hover state.
+4. A module: "What do you want to play?" — a natural-language input where users
+   describe their mood and get 5 AI-powered recommendations.
+5. Sidebar or secondary column: "Latest News" list with thumbnails and "Recent Reviews".
+6. A small band highlighting a unique feature: "Download all game art & screenshots
+   in high quality" with a download icon.
+7. Footer: simple, dark, with section links and social icons.
+
+DETAILS
+- All content in English. Use realistic placeholder game data (invented titles are
+  fine, do not use real copyrighted game art).
+- Desktop-first layout but keep it responsive-friendly.
+- Density inspired by albumoftheyear.org: lots of information, but breathable
+  thanks to spacing and hierarchy, never cluttered.
+```
+
+## 8b. Prompt para Claude Design (design system — hacer PRIMERO)
+
+```
+Create a complete DESIGN SYSTEM for "Sibi Gamers", a video game portal centered on
+aggregated game ratings (0-100 scores), plus news, reviews, and guides.
+
+BRAND CONTEXT
+"Sibi" means fire in Jñatjo (Mazahua), an indigenous language of central Mexico.
+The founder is Mazahua. The entire identity is built on fire: from ink-black
+darkness through ember reds to amber flame. The brand should feel culturally
+rooted but contemporary — never folkloric or costume-like.
+
+DESIGN PRINCIPLES
+1. Simple and modern: no visual noise, no gamer clichés (no neon, no glitch, no RGB).
+2. Dark editorial and data-first: content and numbers are the heroes.
+3. Reference: albumoftheyear.org homepage — near-black background, minimal top nav
+   (wordmark left, search right), small uppercase section headers with "VIEW ALL"
+   links, dense grids of cover art, scores shown as plain numbers with a thin
+   colored underline bar, muted gray secondary text, generous information density
+   kept breathable by spacing, not decoration.
+4. Motion with purpose: the site uses GSAP animations throughout — subtle,
+   fast, and meaningful. Never decorative for its own sake.
+
+LOGO
+Design a flame logomark inspired by Mazahua geometric embroidery (eight-pointed
+star patterns, stepped diamonds, zigzag lines). Requirements:
+- A single flame silhouette constructed from simple geometric shapes — angular,
+  stepped or faceted, echoing textile patterns. NOT a literal realistic flame,
+  NOT overloaded with detail.
+- Must work as: full lockup (mark + "SIBI GAMERS" wordmark), standalone mark,
+  and 16px favicon.
+- One color version in Amber Flame #FFBA08, one in near-white, one in Ink Black.
+- Wordmark in the display typeface, tight tracking, all caps.
+
+COLOR TOKENS (use exactly these)
+Backgrounds & surfaces:
+- bg/primary: Ink Black #03071E
+- surface/card: Night Bordeaux #370617
+- border & hover: Black Cherry #6A040F
+Score scale (core of the brand — number and underline bar take this color):
+- score/low (0-49): Oxblood #9D0208, Brick Ember #D00000
+- score/mid (50-69): Red Ochre #DC2F02, Cayenne Red #E85D04
+- score/high (70-84): Deep Saffron #F48C06
+- score/top (85-100): Orange #FAA307, Amber Flame #FFBA08
+Actions:
+- primary CTA: Amber Flame #FFBA08 (dark text on top)
+- links: Deep Saffron #F48C06
+Text:
+- primary: near-white #F5F3F0
+- secondary: warm gray #9A938E
+Include usage rules and accessibility notes (contrast on dark backgrounds).
+
+TYPOGRAPHY
+- Display: bold, condensed-leaning typeface for headlines, game titles, and the
+  big score numbers. Suggest a specific Google Font.
+- Body/UI: clean modern sans-serif for text, tables, labels. Suggest a pairing.
+- Define the scale: h1-h4, body, caption, the small uppercase section header
+  style (letter-spaced, like AOTY's "NEW RELEASES"), and the score number style
+  (largest text on any page).
+
+CORE COMPONENTS (show each in the system)
+- Top navigation bar (wordmark left, links center: Rankings / Reviews / News /
+  Guides, search input right)
+- Score display: big colored number + thin colored underline bar + small
+  "based on N sources" caption — in 3 sizes (hero, card, table row)
+- Game card: cover art, title, platforms, genre tags, score
+- Ranking table row: rank, thumbnail, title, date, platforms, score right-aligned
+- Buttons: primary (amber), secondary (outline cherry), text link
+- Input field and the "What do you want to play?" AI prompt box
+- News list item: thumbnail, source label, headline
+- Tags/chips for genres and platforms
+- Footer
+
+MOTION GUIDELINES (GSAP)
+Define a small motion system to be used across the whole project:
+- Durations: fast 0.2s (hovers), base 0.4s (reveals), slow 0.8s (hero)
+- Easing: expo.out for entrances, power2.inOut for transitions
+- Signature animations: score numbers count up from 0 when scrolled into view;
+  section content reveals with a slight stagger (ScrollTrigger); cards lift
+  subtly on hover with the underline bar expanding; the flame logomark has one
+  discreet idle or hover animation (e.g., a gentle flicker via scale/skew).
+- Rule: animations never block reading; everything works without them.
+
+DELIVERABLE
+A single design system sheet: logo variations, color tokens with hex labels,
+type scale specimens, all components in default/hover states, and the motion
+specs written as annotations. Dark background throughout. All labels in English.
+```
+
+## 8c. Prompt para Claude Design (página de detalle de juego)
+
+```
+Using the Sibi Gamers design system, design the GAME DETAIL PAGE — the most
+important page of the site, where the aggregated score lives.
+
+LAYOUT (top to bottom)
+1. Hero: game cover art left; right side: title (display type), studio, release
+   date, platforms, genre tags — and the score block: huge colored 0-100 number,
+   thin colored underline, "based on N sources", plus a small "How we score" link.
+2. Score breakdown (the AOTY signature, our core feature): a clean table listing
+   every source: outlet name, original score in its native format (9/10, 4/5, B+),
+   normalized 0-100 value in the score color, and an external-link icon to the
+   original review. Below the table: a small histogram of the score distribution.
+3. "Play on" row: store buttons (Steam, PS Store, Xbox, eShop, GOG, Epic) — these
+   will carry affiliate links.
+4. Media gallery: screenshots and key art grid with a "Download all in high
+   quality" button and per-image download on hover.
+5. About: short description, metadata table (studio, country, director, budget,
+   length), and related guides & news for this game.
+6. Bottom: "More like this" — 4 game cards.
+
+MOTION (GSAP, per the design system)
+Score counts up on load; breakdown rows stagger in; gallery images reveal on scroll.
+
+Use invented placeholder data consistent with the homepage (e.g., Ashen Trials,
+94, based on 51 sources). English. Desktop-first, responsive-friendly.
+```
+
+## 8d. Plan de datos (sistema de score)
+
+- **Metadata e imágenes:** IGDB API (vía cuenta dev de Twitch, gratis) + RAWG API. Alimentan nombres, portadas, screenshots, géneros, plataformas, estudios — y el feature de imágenes HQ.
+- **Scores por fuente (MVP):** curación semiautomatizada de los 20-30 juegos top de 2026. Por juego: score de 10-15 outlets (IGN, GameSpot, PC Gamer, Eurogamer, Polygon…) + URL de la reseña original. Sin scraping masivo que viole ToS; los scores son datos factuales y siempre se enlaza a la fuente (modelo AOTY/OpenCritic). Respaldo: `aggregated_rating` de IGDB.
+- **Normalización:** 9/10 → 90 · 4/5 → 80 · letter grades (B+ → 78, etc.) · definir mínimo de fuentes para publicar score.
+- **Página "How we score":** metodología pública (fuentes, normalización, promedio). Bandera de transparencia contra la opacidad de Metacritic.
+- **Pendiente:** crear cuentas en dev.twitch.tv (IGDB) y rawg.io/apidocs; definir modelo de datos (games, sources, reviews) antes de Claude Code.
+
+## 11. Arquitectura técnica (estado actual del repo)
+
+**Stack: Astro 7 + islas React 19 + GSAP 3 + TypeScript.**
+
+**Por qué Astro y no un SPA.** Este es un negocio de SEO: la página de juego es la
+máquina de ingresos y las noticias y guías son el tráfico que la alimenta (§5). Un
+SPA renderizado en cliente entrega al crawler un `<div>` vacío, un solo `<title>` y
+un LCP lento — justo lo contrario de lo que el modelo necesita. Astro entrega HTML
+completo por ruta, con su propio title, description y canonical, y solo hidrata las
+piezas que de verdad tienen estado.
+
+Medido en el build actual: **1.7 kB gz de JS por página** frente a los 129 kB gz del
+SPA que se descartó.
+
+```
+src/
+  pages/            una ruta por archivo → HTML estático
+  layouts/Base      shell + <head> por página (title, description, canonical, OG)
+  content/          reviews · news · guides en Markdown (content collections)
+  content.config.ts esquemas Zod que validan el frontmatter en cada build
+  ds/               design system portado del bundle de Claude Design
+    tokens/         colors · typography · spacing · fonts — copiados literales
+  components/       componentes .astro (cero JS en cliente)
+  islands/          los ÚNICOS componentes React que se hidratan:
+                      RankingsBoard  selector década/año + ranking
+                      PromptBox      recomendador
+  scripts/
+    motion.ts       GSAP para todo el sitio, vía data-attributes
+    filters.ts      filtros de Reviews/News/Guides sin framework (428 B gz)
+  data/games.ts     datos estructurados de juegos (futuro: IGDB/RAWG)
+```
+
+**Reglas que sostienen la arquitectura:**
+
+1. **Nada es isla salvo que tenga estado.** Animar no justifica hidratar: el markup
+   estático se apunta al sistema de motion con `data-reveal`, `data-count`,
+   `data-hover-lift`, `data-flame`.
+2. **Los filtros no re-renderizan.** Todas las tarjetas se sirven en el HTML y el
+   filtro solo alterna `hidden`. El crawler ve el catálogo completo, no el subconjunto
+   que el filtro por defecto seleccione.
+3. **El motion es estrictamente aditivo.** GSAP (44 kB gz) se importa dinámicamente
+   en `requestIdleCallback`, y **no se descarga en absoluto** si el visitante pidió
+   reduced-motion. Los scores traen su valor final en el HTML y los reveals solo hacen
+   aparecer contenido: si el script nunca corre, la página está completa y correcta.
+4. **Los tokens del design system no se editan a mano.** `src/ds/tokens/*.css` son
+   copia literal del proyecto de Claude Design; re-sincronizar es reemplazar archivos.
+   Los overrides de página viven en `src/styles/app.css`.
+5. **Editorial en Markdown, datos de juego en TypeScript.** Reviews, noticias y guías
+   son contenido y van en content collections. Juegos y scores son datos y saldrán de
+   APIs (§8d), así que no se disfrazan de Markdown.
+
+**Deuda conocida:**
+- Falta el adapter de deploy; sin él no hay rutas SSR y el recomendador sigue con un
+  banco de recomendaciones estático.
+- Todos los enlaces de tarjeta apuntan a `#`: no existen rutas de detalle todavía.
+- Todo el copy (verdicts, headlines, guías, nombres de críticos) es placeholder
+  inventado. Hay que reemplazarlo antes de cualquier lanzamiento.
+
+## 9. Herramientas
+
+- **Claude (este Proyecto):** planeación y seguimiento; la memoria del proyecto vive aquí
+- **Claude Design:** identidad visual y mockups
+- **Claude Code:** desarrollo del sitio
+- **APIs candidatas:** RAWG, IGDB (datos e imágenes), Claude API (recomendador y contenido)
+
+## 10. Registro de decisiones
+
+| Fecha | Decisión |
+|---|---|
+| Jul 2026 | Nombre final: **Sibi Gamers** (sibi = fuego en jñatjo). Descartados: YGamers, yeyosgamers (slang en EU), AZGamers (lectura "Arizona"), gamers.gg (conflicto con games.gg) |
+| Jul 2026 | Pilares: rankings agregados (principal), noticias, reseñas y guías |
+| Jul 2026 | Diferenciadores: imágenes HQ descargables, recomendador IA, guías profundas |
+| Jul 2026 | Diseño: oscuro editorial, score 0–100 coloreado, top 3 cards + tabla, display + sans, sitio en inglés |
+| Jul 2026 | Monetización: afiliados en páginas de juego primero, ads después |
+| Ago 2026 | **Stack: Astro + islas React + GSAP.** Razón: el negocio es SEO-first (§5), y un SPA cliente no entrega HTML rastreable ni meta por ruta. Se descartó un primer prototipo en Vite + React Router (129 kB gz de JS) y se portó antes de añadir páginas nuevas, mientras el costo de migración era bajo |
+| Ago 2026 | Contenido editorial (reviews, noticias, guías) en Markdown vía content collections con esquemas Zod. Los datos de juegos siguen en TypeScript porque vendrán de IGDB/RAWG |
+| Ago 2026 | Reviews / News / Guides se construyen **code-first** sobre el design system, sin esperar re-derivación en Claude Design. La página de detalle de juego SÍ pasa por Design→Code por ser la página de ingresos |
+| Ago 2026 | GSAP se carga en idle y no se carga con reduced-motion: el motion es aditivo, nunca requisito para leer |

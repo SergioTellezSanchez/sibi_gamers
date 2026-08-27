@@ -1,0 +1,54 @@
+---
+import { GRADIENTS } from "../data/games";
+import { scoreColor, scoreBand } from "../ds/scoreColor";
+
+interface Props {
+  title: string;
+  score: number;
+  verdict: string;
+  excerpt: string;
+  critic: string;
+  date: string;
+  genre: string;
+  platforms: string[];
+  index: number;
+}
+
+const { title, score, verdict, excerpt, critic, date, genre, platforms, index } =
+  Astro.props;
+---
+
+<article
+  class="review-card"
+  data-reveal-item
+  data-hover-lift
+  data-filter-value={scoreBand(score)}
+>
+  <div
+    class="review-card__cover"
+    style={`background:${GRADIENTS[index % GRADIENTS.length]}`}
+    aria-hidden="true"
+  >
+  </div>
+
+  <div class="review-card__body">
+    <div class="review-card__top">
+      <div>
+        <h3 class="review-card__title"><a href="#">{title}</a></h3>
+        <div class="review-card__meta">{genre} · {platforms.join(" · ")}</div>
+      </div>
+      <div class="review-card__score" style={`color:${scoreColor(score)}`}>
+        <span data-count={score}>{score}</span>
+        <span class="review-card__rule" data-hover-bar></span>
+      </div>
+    </div>
+
+    <p class="review-card__verdict">{verdict}</p>
+    <p class="review-card__excerpt">{excerpt}</p>
+
+    <div class="byline">
+      <span class="byline__name">{critic}</span>
+      <span class="byline__date">{date}</span>
+    </div>
+  </div>
+</article>

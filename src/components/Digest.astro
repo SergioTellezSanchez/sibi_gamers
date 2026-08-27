@@ -1,0 +1,75 @@
+---
+import { getCollection } from "astro:content";
+import { GRADIENTS } from "../data/games";
+import ScoreDisplay from "./ScoreDisplay.astro";
+
+// Homepage digest reads the same collections the section pages do, so a new
+// Markdown file shows up here without touching any component.
+const news = (await getCollection("news"))
+  .filter((n) => !n.data.lead)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 5);
+
+const reviews = (await getCollection("reviews"))
+  .filter((r) => !r.data.lead)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 5);
+---
+
+<div class="cols" data-reveal data-reveal-stagger="0.05">
+  <section>
+    <div class="col__head">
+      <h2 class="eyebrow">Latest news</h2>
+      <a class="eyebrow eyebrow--link" href="/news/">View all</a>
+    </div>
+    <ul class="list">
+      {
+        news.map((item, i) => (
+          <li class="list-item" data-reveal-item>
+            <span
+              class="list-item__thumb"
+              style={`background:${GRADIENTS[i % GRADIENTS.length]}`}
+              aria-hidden="true"
+            />
+            <div class="list-item__body">
+              <div class="list-item__source">{item.data.source}</div>
+              <a class="list-item__headline" href="/news/">
+                {item.data.headline}
+              </a>
+              <div class="list-item__date">{item.data.displayDate}</div>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section>
+    <div class="col__head">
+      <h2 class="eyebrow">Recent reviews</h2>
+      <a class="eyebrow eyebrow--link" href="/reviews/">View all</a>
+    </div>
+    <ul class="list">
+      {
+        reviews.map((item, i) => (
+          <li class="list-item" data-reveal-item>
+            <span
+              class="list-item__thumb"
+              style={`background:${GRADIENTS[(i + 3) % GRADIENTS.length]}`}
+              aria-hidden="true"
+            />
+            <div class="list-item__body">
+              <a class="list-item__title" href="/reviews/">
+                {item.data.title}
+              </a>
+              <div class="list-item__excerpt">{item.data.verdict}</div>
+            </div>
+            <div class="list-item__score">
+              <ScoreDisplay score={item.data.score} size="card" />
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</div>

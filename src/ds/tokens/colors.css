@@ -1,0 +1,54 @@
+/* Sibi Gamers — Color tokens
+   Fire spectrum: ink-black darkness through ember reds to amber flame.
+   Base hex tokens first, semantic aliases below. */
+
+:root {
+  /* ---- Base palette (exact hexes from brand spec) ---- */
+  --color-ink-black: #03071e;
+  --color-night-bordeaux: #370617;
+  --color-black-cherry: #6a040f;
+  --color-oxblood: #9d0208;
+  --color-brick-ember: #d00000;
+  --color-red-ochre: #dc2f02;
+  --color-cayenne-red: #e85d04;
+  --color-deep-saffron: #f48c06;
+  --color-orange: #faa307;
+  --color-amber-flame: #ffba08;
+  --color-white: #f5f3f0;
+  --color-warm-gray: #9a938e;
+
+  /* ---- Backgrounds & surfaces ---- */
+  --bg-primary: var(--color-ink-black);
+  --bg-elevated: #060b26; /* slightly lifted ink, for modals/sticky bars */
+  --surface-card: var(--color-night-bordeaux);
+  --surface-card-hover: #451022;
+  --border-default: var(--color-black-cherry);
+  --border-hover: var(--color-black-cherry);
+
+  /* ---- Score scale (core of the brand) ---- */
+  --score-low: var(--color-brick-ember); /* 0-49 */
+  --score-low-alt: var(--color-oxblood);
+  --score-mid: var(--color-cayenne-red); /* 50-69 */
+  --score-mid-alt: var(--color-red-ochre);
+  --score-high: var(--color-deep-saffron); /* 70-84 */
+  --score-top: var(--color-amber-flame); /* 85-100 */
+  --score-top-alt: var(--color-orange);
+
+  /* ---- Actions ---- */
+  --action-primary: var(--color-amber-flame);
+  --action-primary-text: var(--color-ink-black); /* dark text on amber */
+  --action-primary-hover: var(--color-orange);
+  --action-secondary-border: var(--color-black-cherry);
+  --action-secondary-text: var(--color-white);
+  --action-secondary-hover-bg: var(--color-night-bordeaux);
+  --link: var(--color-deep-saffron);
+  --link-hover: var(--color-amber-flame);
+
+  /* ---- Text ---- */
+  --text-primary: var(--color-white);
+  --text-secondary: var(--color-warm-gray);
+  --text-disabled: #5a554f;
+
+  /* ---- Focus / misc ---- */
+  --focus-ring: var(--color-deep-saffron);
+}

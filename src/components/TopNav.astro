@@ -1,0 +1,53 @@
+---
+const LINKS = [
+  { label: "Rankings", href: "/" },
+  { label: "Reviews", href: "/reviews/" },
+  { label: "News", href: "/news/" },
+  { label: "Guides", href: "/guides/" },
+];
+
+const path = Astro.url.pathname;
+const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
+---
+
+<header class="nav">
+  <div class="nav__inner">
+    <a class="nav__brand" href="/">
+      <img
+        class="nav__mark"
+        data-flame
+        src="/assets/mark-amber.svg"
+        alt=""
+        width="26"
+        height="26"
+      />
+      <span class="nav__wordmark">Sibi Gamers</span>
+    </a>
+
+    <nav class="nav__links" aria-label="Primary">
+      {
+        LINKS.map((link) => (
+          <a
+            class="nav-item"
+            href={link.href}
+            aria-current={isActive(link.href) ? "page" : undefined}
+          >
+            <span class="nav-item__label">{link.label}</span>
+            <span class="nav-item__bar nav-item__bar--1" />
+            <span class="nav-item__bar nav-item__bar--2" />
+            <span class="nav-item__bar nav-item__bar--3" />
+          </a>
+        ))
+      }
+    </nav>
+
+    <form class="nav__search" role="search" action="/search">
+      <input
+        type="search"
+        name="q"
+        placeholder="Search games, studios, people"
+        aria-label="Search"
+      />
+    </form>
+  </div>
+</header>

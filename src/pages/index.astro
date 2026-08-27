@@ -1,0 +1,22 @@
+---
+import Base from "../layouts/Base.astro";
+import Digest from "../components/Digest.astro";
+import FeatureBand from "../components/FeatureBand.astro";
+import PromptBox from "../islands/PromptBox";
+import RankingsBoard from "../islands/RankingsBoard";
+---
+
+<Base
+  title="Sibi Gamers — Best games of 2026, ranked"
+  description="Aggregated 0-100 scores for every game, from as many sources as we can find. Plus reviews, news and deep guides."
+>
+  {/* client:load — the year picker is above the fold, so it hydrates eagerly.
+      Astro still server-renders it, so the HTML holds the 2026 ranking. */}
+  <RankingsBoard client:load />
+
+  <PromptBox client:visible />
+
+  <Digest />
+
+  <FeatureBand />
+</Base>

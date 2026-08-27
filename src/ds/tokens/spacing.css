@@ -1,0 +1,40 @@
+/* Sibi Gamers — Spacing, radius, shadow, motion tokens */
+:root {
+  /* Spacing scale (4px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* Layout */
+  --container-max: 1280px;
+  --gutter: var(--space-6);
+
+  /* Radius — small, functional, never decorative */
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-pill: 999px;
+
+  /* Borders */
+  --border-width: 1px;
+  --underline-height: 3px;
+
+  /* Shadow — minimal; dark UI relies on surface color shifts, not drop shadow */
+  --shadow-card: 0 1px 0 rgba(0, 0, 0, 0.4);
+  --shadow-elevated: 0 8px 24px rgba(3, 7, 30, 0.6);
+
+  /* Motion (GSAP) */
+  --motion-fast: 0.2s;
+  --motion-base: 0.4s;
+  --motion-slow: 0.8s;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-power2: cubic-bezier(0.45, 0, 0.55, 1);
+}

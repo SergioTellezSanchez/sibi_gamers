@@ -1,0 +1,32 @@
+---
+import { GRADIENTS } from "../data/games";
+
+interface Props {
+  headline: string;
+  standfirst: string;
+  source: string;
+  category: string;
+  displayDate: string;
+  index: number;
+}
+
+const { headline, standfirst, source, category, displayDate, index } = Astro.props;
+---
+
+<li class="story" data-reveal-item data-filter-value={category}>
+  <span
+    class="story__thumb"
+    style={`background:${GRADIENTS[index % GRADIENTS.length]}`}
+    aria-hidden="true"></span>
+
+  <div class="story__body">
+    <div class="story__kicker">
+      <span class="story__source">{source}</span>
+      <span class="story__dot">·</span>
+      <span class="story__category">{category}</span>
+    </div>
+    <h3 class="story__headline"><a href="#">{headline}</a></h3>
+    <p class="story__standfirst">{standfirst}</p>
+    <div class="story__date">{displayDate}</div>
+  </div>
+</li>

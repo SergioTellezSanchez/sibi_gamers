@@ -1,0 +1,15 @@
+---
+interface Props {
+  title: string;
+  subtitle: string;
+  meta?: string;
+}
+
+const { title, subtitle, meta } = Astro.props;
+---
+
+<header class="page-header" data-reveal data-reveal-stagger="0.07">
+  <h1 class="page-header__title" data-reveal-item>{title}</h1>
+  <p class="page-header__subtitle" data-reveal-item>{subtitle}</p>
+  {meta && <div class="page-header__meta eyebrow" data-reveal-item>{meta}</div>}
+</header>

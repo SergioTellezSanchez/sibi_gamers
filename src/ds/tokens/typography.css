@@ -1,0 +1,32 @@
+/* Sibi Gamers — Typography tokens
+   Display: Big Shoulders (condensed, bold, geometric) — headlines, titles, score numbers.
+   Body/UI:  IBM Plex Sans — text, tables, labels.
+   NOTE: No font files were provided by the brand. These are Google Fonts
+   substitutions loaded via tokens/fonts.css — swap for licensed files when supplied. */
+
+:root {
+  --font-display: "Big Shoulders", "Arial Narrow", sans-serif;
+  --font-body: "IBM Plex Sans", -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Type scale */
+  --text-h1: 700 56px/1.02 var(--font-display);
+  --text-h2: 700 40px/1.05 var(--font-display);
+  --text-h3: 600 28px/1.15 var(--font-display);
+  --text-h4: 600 20px/1.25 var(--font-display);
+  --text-body: 400 16px/1.5 var(--font-body);
+  --text-body-sm: 400 14px/1.5 var(--font-body);
+  --text-caption: 500 12px/1.4 var(--font-body);
+
+  /* Small uppercase section header, à la AOTY "NEW RELEASES" */
+  --text-section-header: 600 12px/1.2 var(--font-body);
+  --section-header-tracking: 0.12em;
+
+  /* Score numbers — the largest text on any page */
+  --text-score-hero: 800 96px/0.9 var(--font-display);
+  --text-score-card: 800 32px/0.9 var(--font-display);
+  --text-score-row: 800 20px/0.9 var(--font-display);
+
+  --tracking-tight: -0.01em;
+  --tracking-wordmark: 0.01em;
+}
