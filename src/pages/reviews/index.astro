@@ -7,10 +7,12 @@ import LeadFeature from "../../components/LeadFeature.astro";
 import ReviewCard from "../../components/ReviewCard.astro";
 import ScoreDisplay from "../../components/ScoreDisplay.astro";
 import Tag from "../../components/Tag.astro";
-import { GRADIENTS, sourceCountFor } from "../../data/games";
+import { GRADIENTS, findGameByTitle, sourceCountFor } from "../../data/games";
 
 const all = await getCollection("reviews");
 const lead = all.find((r) => r.data.lead);
+const leadGame = lead && findGameByTitle(lead.data.title);
+const leadSources = leadGame && sourceCountFor(leadGame.id);
 const rest = all
   .filter((r) => !r.data.lead)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
@@ -66,7 +68,7 @@ const fmt = (d: Date) =>
           <ScoreDisplay
             score={lead.data.score}
             size="hero"
-            sourceCount={sourceCountFor(lead.data.title)}
+            sourceCount={leadSources}
           />
         </div>
       </LeadFeature>

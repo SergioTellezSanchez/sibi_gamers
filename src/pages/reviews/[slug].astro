@@ -4,7 +4,7 @@ import Base from "../../layouts/Base.astro";
 import ArticleShell from "../../components/ArticleShell.astro";
 import ScoreDisplay from "../../components/ScoreDisplay.astro";
 import Tag from "../../components/Tag.astro";
-import { GRADIENTS, sourceCountFor } from "../../data/games";
+import { GRADIENTS, findGameByTitle, sourceCountFor } from "../../data/games";
 
 export async function getStaticPaths() {
   const all = await getCollection("reviews");
@@ -26,9 +26,10 @@ const fmt = (date: Date) =>
 
 const cover = GRADIENTS[entry.id.length % GRADIENTS.length];
 
-// The review slug is the game id, so the aggregate comes from the same rows
-// the game page will use. Undefined where we have no sources yet.
-const sourceCount = sourceCountFor(d.title);
+// The aggregate belongs to the game, not the review: same rows, same number
+// as the game page. Undefined where we have no sources yet.
+const game = findGameByTitle(d.title);
+const sourceCount = game && sourceCountFor(game.id);
 
 const facts = [
   ["Studio", d.studio],
@@ -104,6 +105,14 @@ const schema = {
         ))
       }
     </dl>
+
+    {game && (
+      <p class="article-crosslink">
+        <a href={`/games/${game.id}/`}>
+          {sourceCount ? `Every one of the ${sourceCount} sources behind this score` : `${game.title} on Sibi Gamers`} &rarr;
+        </a>
+      </p>
+    )}
   </ArticleShell>
 
   <script type="application/ld+json" set:html={JSON.stringify(schema)} is:inline />

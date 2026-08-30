@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { GAMES, REC_BANK, getGame, relatedGames, scoreFor } from "../../data/games";
 import { OUTLETS, OUTLETS_BY_ID } from "../../data/outlets";
 import { rowsForGame, SCORE_ROWS } from "../../data/scores";
 import { aggregate, MIN_SOURCES, resolve } from "./aggregate";
@@ -130,5 +131,33 @@ describe("seed data", () => {
       const a = aggregate(resolve(rowsForGame(gameId), OUTLETS_BY_ID));
       expect([gameId, a.count, a.mean]).toEqual([gameId, count, mean]);
     }
+  });
+});
+
+describe("catalogue", () => {
+  it("has unique ids and titles", () => {
+    expect(new Set(GAMES.map((g) => g.id)).size).toBe(GAMES.length);
+    expect(new Set(GAMES.map((g) => g.title)).size).toBe(GAMES.length);
+  });
+
+  it("every score row cites a catalogue game", () => {
+    for (const row of SCORE_ROWS) expect(getGame(row.gameId), row.gameId).toBeDefined();
+  });
+
+  // The homepage prints the catalogue number; the game page prints the
+  // aggregate. They must be the same number or the site contradicts itself.
+  it("agrees with the aggregate wherever rows exist", () => {
+    for (const g of GAMES) {
+      const { aggregate: a } = scoreFor(g.id);
+      if (a.published) expect([g.id, g.score]).toEqual([g.id, a.mean]);
+    }
+  });
+
+  it("recommends only catalogue games, and never the game itself", () => {
+    for (const rec of REC_BANK) expect(getGame(rec.id)).toBeDefined();
+    const ashen = getGame("ashen-trials")!;
+    const related = relatedGames(ashen);
+    expect(related).toHaveLength(4);
+    expect(related.map((g) => g.id)).not.toContain(ashen.id);
   });
 });
