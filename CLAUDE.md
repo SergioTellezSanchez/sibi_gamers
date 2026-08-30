@@ -63,6 +63,7 @@ src/
   ds/               design system — tokens are generated, do not hand-edit
   components/       .astro, zero client JS
   islands/          the only two React components that hydrate
+  pages/api/        recommend.ts — the one server route; lib/recommend.ts is its pure half
   scripts/          motion.ts (GSAP, data-attribute driven) · filters.ts
   lib/score/        normalization + aggregation; the only place a score is computed
   data/games.ts     the catalogue — 20 games; everything else derives from it
@@ -90,10 +91,15 @@ Built: homepage, three section indices, 34 article pages, 20 game pages
 (`src/lib/score/`, 20 tests), the motion and filter systems, and a
 cross-device pass from 320px to 2560px.
 
+Built: `/api/recommend`, the one SSR route — Claude picks five games from
+the catalogue with structured output; without `ANTHROPIC_API_KEY` it answers
+from the static bank and says so.
+
 Not built: real score data (three games are seeded, the rest publish no
-score), IGDB/RAWG metadata and art, `/api/recommend`, search (the nav form
-posts to `/search`, which does not exist), the footer's About/Contact/Press/
-Terms/Privacy pages.
+score), IGDB/RAWG metadata and art, search (the nav form posts to `/search`,
+which does not exist), the footer's About/Contact/Press/Terms/Privacy pages.
+`ANTHROPIC_API_KEY` is not yet set on Vercel, so the live recommender is on the
+bank.
 
 Deployed to https://sibi-gamers.vercel.app. The canonical URLs still say
 `sibigamers.gg`, a domain that is not attached yet — a known, deliberate gap.

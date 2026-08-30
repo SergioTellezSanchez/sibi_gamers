@@ -31,9 +31,9 @@ pages existed, while the migration was still cheap (decision log, Aug 2026).
 
 ## 3. Rendering model
 
-`output: "static"`. Every route is prerendered to HTML at build time. The
-Vercel adapter is installed, but no route has opted into SSR, so nothing runs on
-a server yet.
+`output: "static"`. Every page is prerendered to HTML at build time. One
+route opts out: `/api/recommend` sets `prerender = false` and runs as a Vercel
+function, because it holds an API key that must never reach the browser.
 
 | Route | Source | Count |
 | --- | --- | --- |
@@ -44,6 +44,7 @@ a server yet.
 | `/guides/[slug]/` | `content/guides/*.md` | 10 |
 | `/games/[slug]/` | `data/games.ts` catalogue | 20 |
 | `/how-we-score/` | `pages/how-we-score.astro` | 1 |
+| `/api/recommend` | `pages/api/recommend.ts` | SSR, POST only |
 
 **59 pages total.** Editorial detail routes use `getStaticPaths()` over the
 collection and `render(entry)` for the body. Each carries prev/next within its own section,
@@ -213,10 +214,15 @@ pnpm test     # vitest — the score model's arithmetic
 wired into `build`; it covers `src/lib/score/`, where the failure mode is a
 wrong number rather than a type error.
 
-`@astrojs/vercel` is installed and wired in `astro.config.mjs`, so a route can
-opt into SSR with `export const prerender = false`. None does yet, which is why
-`/api/recommend` still does not exist and `PromptBox` serves from a static
-recommendation bank (`REC_BANK`).
+`@astrojs/vercel` is installed and wired in `astro.config.mjs`. `/api/recommend`
+is the one route that opts into SSR (`export const prerender = false`); the
+build emits it as a single `_render` function and every page stays static.
+
+The recommender needs `ANTHROPIC_API_KEY` in the Vercel project's environment.
+Without it the route answers from the static bank (`REC_BANK`) with
+`source: "bank"`, and the island prints a caption saying so. Set it with
+`vercel env add ANTHROPIC_API_KEY production` — it is never committed and
+never sent to the browser.
 
 The site is deployed to Vercel at **https://sibi-gamers.vercel.app** (project
 `sibi-gamers`, personal scope, GitHub repo connected — pushes to `main` deploy).

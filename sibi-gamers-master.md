@@ -88,7 +88,10 @@ Portal de videojuegos con tres pilares de contenido y un diferenciador central:
 - [x] **Sistema de score** (`src/lib/score/`) — normalización de cualquier escala a
       0-100 y agregados (media, mediana, histograma) derivados de las filas, nunca
       almacenados. 16 tests con `pnpm test`. Falta la curación de datos reales
-- [ ] Endpoint `/api/recommend` con la API de Claude (reservado, requiere adapter)
+- [x] **Endpoint `/api/recommend`** con la API de Claude (`claude-opus-5`, salida
+      estructurada, esfuerzo bajo, caché del catálogo). Única ruta SSR. Sin
+      `ANTHROPIC_API_KEY` en Vercel responde con el banco estático y lo dice; la
+      clave hay que añadirla en el proyecto de Vercel
 - [x] **Página de detalle de juego** (`/games/[slug]/`, 20 páginas) según la dirección A:
       key art, tira de score, desglose por fuente con histograma, rail con tienda /
       reseña / guías / noticias, galería, ficha y "más como este". JSON-LD
@@ -412,8 +415,10 @@ src/
    APIs (§8d), así que no se disfrazan de Markdown.
 
 **Deuda conocida:**
-- El adapter ya está, pero ninguna ruta ha optado por SSR: el recomendador sigue
-  sirviendo desde un banco estático hasta que exista `/api/recommend`.
+- El recomendador está construido pero **sin clave en producción**: hasta que
+  `ANTHROPIC_API_KEY` exista en Vercel, responde con el banco estático y el pie lo
+  dice. Tampoco hay límite de peticiones por visitante; hay que ponerlo antes de
+  anunciar la función.
 - Los 133 scores por outlet son inventados y se atribuyen a publicaciones reales
   sobre juegos que no existen. La aritmética sí es real y está testeada; las filas
   no. Curar datos reales (20-30 juegos, 10-15 outlets cada uno) es trabajo manual
@@ -453,6 +458,8 @@ src/
 | Ago 2026 | **Plantilla de artículo en código, no en Claude Design.** Fase 2 la listaba como entregable de diseño, pero se resolvió por el precedente de los índices: lo editorial se construye code-first sobre el design system y solo la página de juego pasa por Design→Code. Desbloquea 34 artículos que ya existían en Markdown pero no tenían ruta |
 | Ago 2026 | **Score mínimo de 5 fuentes para publicar**, igual que OpenCritic, y **sin ponderación por outlet** en el MVP (`weight` existe pero se ignora, para no migrar datos después). Una reseña revisada reemplaza a la original: una fila por outlet, gana la más reciente |
 | Ago 2026 | **`sourceCount` deja de escribirse a mano.** Sale de `sourceCountFor()`, que cuenta filas reales, o no se renderiza. Los 17 juegos sin filas dejaron de mostrar un número inventado, y el campo salió del frontmatter de las reseñas: la reseña es un crítico, el agregado es del juego |
+| Ago 2026 | **El recomendador nunca falla hacia el usuario.** Sin clave, con rate limit, con rechazo o con respuesta mal formada, devuelve el banco estático con `source: "bank"` y la isla lo etiqueta. Un fallback que parece real es una mentira; uno etiquetado es una degradación honesta |
+| Ago 2026 | **El modelo solo redacta los motivos.** Los ids se validan contra el catálogo y título y score salen de ahí, no de la respuesta: el modelo no puede inventar un juego ni un número |
 | Ago 2026 | **Un solo catálogo de juegos.** La identidad de un juego estaba repartida entre dos arrays en `games.ts`, el frontmatter de las reseñas y `scores.ts`, unidos por slug del título. Ahora `GAMES` es la única fuente y el `id` explícito es la clave de ruta y de score. Las reseñas siguen indexadas por título porque las escriben personas |
 | Ago 2026 | **El key art de la página de juego llena el contenedor, no el viewport.** Un full-bleed real (`margin: calc(50% - 50vw)`) desborda por el ancho de la barra de scroll en todo SO que la dibuje, y el sitio garantiza cero desbordamiento horizontal |
 | Ago 2026 | **"Mostrar las 51 fuentes" es un `<details>` nativo.** Todas las filas van en el HTML y nada hidrata: cumple los invariantes 1 y 2 sin excepción para la página de ingresos |

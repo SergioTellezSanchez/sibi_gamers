@@ -810,6 +810,19 @@ button {
   flex-shrink: 0;
 }
 
+.promptbox__note {
+  grid-column: 1 / -1;
+  font: var(--text-caption);
+  color: var(--text-disabled);
+  margin: var(--space-2) 0 0;
+}
+
+.promptbox__field input:disabled,
+.promptbox__field .btn:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
 /* ---------- News / reviews columns ---------- */
 
 .cols {

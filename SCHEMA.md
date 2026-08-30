@@ -228,6 +228,24 @@ resolve, so no placeholder row can be mistaken for a citation.
   Neither account exists. Verify commercial terms before launch; the free tiers
   are aimed at non-commercial use.
 
+## 4b. Recommender contract — LIVE
+
+`POST /api/recommend` with `{ "prompt": string }` (3–300 characters).
+
+```ts
+RecommendResponse { picks: Recommendation[]; source: "claude" | "bank" }
+Recommendation    { id, title, reason, score }     // from the catalogue, not the model
+```
+
+The model returns `{ picks: [{ id, reason }] }` under a Zod-derived structured
+output; `sanitizePicks()` then drops unknown or duplicate ids, takes title and
+score from the catalogue, and caps at five. The model's only authored words
+are the reasons. `source` is honest: the island labels bank answers.
+
+400 on a bad prompt, 405 on GET. Every failure past validation — no key, a
+rate limit, a refusal, a parse miss — returns the bank with 200, so the visitor
+always gets five picks and the operator finds the cause in function logs.
+
 ## 5. Consistency rules to preserve
 
 Whatever the score model becomes, these must hold:
