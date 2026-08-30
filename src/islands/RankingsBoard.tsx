@@ -87,7 +87,7 @@ export default function RankingsBoard() {
 
         <div className="hero-grid">
           {topGames.map((game, i) => (
-            <div className="hero-card" key={`${year}-${game.title}`} data-hover-lift>
+            <div className="hero-card" key={`${year}-${game.id}`} data-hover-lift>
               <span className="hero-card__layer hero-card__layer--back" />
               <span className="hero-card__layer hero-card__layer--mid" />
               <span className="hero-card__layer hero-card__layer--front" />
@@ -101,7 +101,7 @@ export default function RankingsBoard() {
                 </div>
 
                 <div className="hero-card__body">
-                  <a className="hero-card__title" href="#">
+                  <a className="hero-card__title" href={`/games/${game.id}/`}>
                     {game.title}
                   </a>
 
@@ -148,7 +148,7 @@ export default function RankingsBoard() {
 
         <ul className="ranks__body">
           {rankedGames.map((game, i) => (
-            <li className="rank-row" key={`${year}-${game.title}`} data-thumb-stack>
+            <li className="rank-row" key={`${year}-${game.id}`} data-thumb-stack>
               <div className="rank-row__num">{game.rank}</div>
 
               <div className="rank-row__thumb">
@@ -162,7 +162,7 @@ export default function RankingsBoard() {
 
               <div className="rank-row__main">
                 <h3 className="rank-row__title">
-                  <a href="#">{game.title}</a>
+                  <a href={`/games/${game.id}/`}>{game.title}</a>
                 </h3>
                 <div className="rank-row__meta">
                   {game.date} · {game.genre} · {game.platforms.join(" · ")}

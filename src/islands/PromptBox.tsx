@@ -54,11 +54,10 @@ export default function PromptBox() {
             data-reveal-stagger="0.06"
           >
             {results.map((rec) => (
-              <div className="rec" key={rec.title} data-reveal-item>
+              <div className="rec" key={rec.id} data-reveal-item>
                 <div>
-                  {/* Master doc §2: recommendations link to their game pages.
-                      Wire these up once the game detail route exists. */}
-                  <a className="rec__title" href="#">
+                  {/* Master doc §2: recommendations link to their game pages. */}
+                  <a className="rec__title" href={`/games/${rec.id}/`}>
                     {rec.title}
                   </a>
                   <div className="rec__reason">{rec.reason}</div>

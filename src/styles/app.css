@@ -562,6 +562,7 @@ button {
 }
 
 .rank-row {
+  position: relative;
   display: grid;
   grid-template-columns: 44px 96px minmax(160px, 1fr) minmax(280px, 1.5fr) 156px;
   align-items: center;
@@ -2079,6 +2080,544 @@ button {
   color: var(--color-amber-flame);
 }
 
+/* ============================================================
+   Game page — direction A ("Broadsheet") from the design canvas
+   ============================================================ */
+
+.game {
+  padding-bottom: var(--space-12);
+}
+
+.game-section__title {
+  font: var(--text-h2);
+  letter-spacing: var(--tracking-tight);
+  margin: 0;
+}
+
+.game-section__sub {
+  font: var(--text-body);
+  color: var(--text-secondary);
+  margin: var(--space-2) 0 0;
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--action-secondary-text);
+  border: 1px solid var(--action-secondary-border);
+}
+
+.btn--ghost:hover {
+  background: var(--action-secondary-hover-bg);
+}
+
+/* ---------- Hero ----------
+   Key art fills the container rather than the viewport: a true full-bleed
+   element (margin: calc(50% - 50vw)) overshoots by the scrollbar width on
+   every OS that draws one, and this site guarantees no horizontal overflow. */
+
+.game-hero {
+  position: relative;
+  min-height: 460px;
+  display: flex;
+  align-items: flex-end;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-default);
+}
+
+.game-hero__art {
+  position: absolute;
+  inset: 0;
+  /* --cover is one of GRADIENTS; the radial keeps it from reading as a flat
+     fill until IGDB/RAWG art replaces it. */
+  background:
+    linear-gradient(20deg, var(--bg-primary) 0%, transparent 55%, transparent 100%),
+    radial-gradient(72% 72% at 26% 34%, var(--color-orange) 0%, var(--color-red-ochre) 34%, var(--cover) 68%, var(--bg-primary) 100%);
+}
+
+.game-hero__mark {
+  position: absolute;
+  right: 12%;
+  top: -10%;
+  height: 120%;
+  fill: var(--bg-primary);
+  opacity: 0.3;
+}
+
+.game-hero__body {
+  position: relative;
+  padding: var(--space-10) var(--space-8);
+  max-width: 760px;
+}
+
+.game-hero__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: var(--space-4);
+}
+
+.game-hero__title {
+  font: var(--text-h1);
+  font-size: clamp(56px, 9vw, 132px);
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.game-hero__standfirst {
+  font: var(--text-body);
+  font-size: 22px;
+  line-height: 1.4;
+  color: var(--text-primary);
+  margin: var(--space-4) 0 0;
+  max-width: 56ch;
+}
+
+/* ---------- Score strip ---------- */
+
+.game-strip {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-8) 0;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.game-strip__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-10);
+  margin: 0;
+}
+
+.game-strip__fact dd {
+  font: var(--text-h4);
+  color: var(--text-primary);
+  margin: var(--space-2) 0 0;
+}
+
+.game-strip__how {
+  align-self: center;
+}
+
+/* ---------- Two columns: breakdown + rail ---------- */
+
+.game-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: var(--space-16);
+  padding: var(--space-12) 0 var(--space-16);
+  border-bottom: 1px solid var(--border-default);
+  align-items: start;
+}
+
+.game-sources__head {
+  align-items: baseline;
+  margin-bottom: var(--space-2);
+}
+
+.game-sources__title {
+  font: var(--text-h2);
+  letter-spacing: var(--tracking-tight);
+  margin: 0;
+}
+
+.game-sources__intro,
+.game-sources__empty {
+  font: var(--text-body);
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-8);
+  max-width: 60ch;
+}
+
+.game-sources__note {
+  font: var(--text-body-sm);
+  color: var(--color-deep-saffron);
+  border-left: var(--underline-height) solid var(--color-deep-saffron);
+  padding-left: var(--space-4);
+  margin: 0 0 var(--space-6);
+}
+
+.srcrow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 92px 92px 28px;
+  align-items: center;
+  gap: var(--space-5);
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border-default);
+  color: var(--text-primary);
+}
+
+.srcrow--head {
+  padding-top: 0;
+}
+
+a.srcrow:hover {
+  color: var(--text-primary);
+  background: var(--surface-card);
+}
+
+a.srcrow:hover .srcrow__outlet {
+  color: var(--color-amber-flame);
+}
+
+.srcrow__outlet {
+  font: var(--text-body);
+  font-weight: 500;
+  transition: color var(--motion-fast) var(--ease-out-expo);
+}
+
+.srcrow__num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.srcrow__native {
+  font: var(--text-body-sm);
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+}
+
+.srcrow__score {
+  font: var(--text-score-row);
+  font-size: 22px;
+}
+
+.srcrow__ext {
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* The "show all" toggle is a native <details>: every row is in the HTML and
+   nothing hydrates (ARCHITECTURE.md §12, invariants 1 and 2). */
+.game-sources__more {
+  margin-top: var(--space-6);
+}
+
+.game-sources__more summary {
+  list-style: none;
+  width: fit-content;
+}
+
+.game-sources__more summary::-webkit-details-marker {
+  display: none;
+}
+
+.game-sources__more[open] summary {
+  display: none;
+}
+
+/* ---------- Histogram ---------- */
+
+.histogram {
+  margin-top: var(--space-16);
+}
+
+.histogram__title {
+  font: var(--text-h3);
+  margin: 0 0 var(--space-1);
+}
+
+.histogram__sub {
+  font: var(--text-body-sm);
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-8);
+}
+
+.histogram__bars,
+.histogram__labels {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+.histogram__bars {
+  align-items: end;
+  height: 180px;
+}
+
+.histogram__col {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 10px;
+  height: 100%;
+}
+
+.histogram__count {
+  font: var(--text-score-row);
+  color: currentColor;
+}
+
+.histogram__bar {
+  display: block;
+  background: currentColor;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  min-height: 2px;
+}
+
+.histogram__labels {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-default);
+}
+
+/* ---------- Rail ---------- */
+
+.game-rail {
+  position: sticky;
+  top: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+}
+
+.game-rail__title {
+  margin: 0 0 var(--space-4);
+}
+
+.game-rail__stores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.game-rail__fine {
+  font: var(--text-caption);
+  color: var(--text-disabled);
+  margin: var(--space-3) 0 0;
+}
+
+.game-rail__link {
+  display: block;
+  padding: 14px 0;
+  border-top: 1px solid var(--border-default);
+  font: var(--text-h4);
+  color: var(--text-primary);
+}
+
+.game-rail__link:hover {
+  color: var(--color-amber-flame);
+}
+
+.game-rail__sub {
+  display: block;
+  font: var(--text-caption);
+  color: var(--text-secondary);
+  margin-top: var(--space-1);
+}
+
+/* ---------- Media ---------- */
+
+.game-media {
+  padding: var(--space-16) 0;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.game-media .section-head {
+  align-items: flex-end;
+  margin-bottom: var(--space-8);
+}
+
+/* Key art at twice the size of the four screenshots beside it. */
+.game-media__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: 180px;
+  gap: var(--space-4);
+}
+
+.game-media__tile {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+}
+
+.game-media__tile:first-child {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+/* ---------- About ---------- */
+
+.game-about {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: var(--space-16);
+  padding: var(--space-16) 0;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.game-about__text {
+  font: var(--text-body);
+  font-size: 18px;
+  line-height: 1.7;
+  margin: var(--space-6) 0 0;
+  max-width: 60ch;
+}
+
+.game-facts {
+  margin: 0;
+}
+
+.game-facts__row {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: var(--space-4);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.game-facts__row dd {
+  font: var(--text-body-sm);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* ---------- More like this ---------- */
+
+.game-related {
+  padding-top: var(--space-16);
+}
+
+.game-related__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+  gap: var(--space-6);
+  margin-top: var(--space-8);
+}
+
+.game-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  color: var(--text-primary);
+  transition:
+    border-color var(--motion-fast) var(--ease-out-expo),
+    background var(--motion-fast) var(--ease-out-expo);
+}
+
+.game-card:hover {
+  background: var(--surface-card-hover);
+  border-color: var(--color-amber-flame);
+  color: var(--text-primary);
+}
+
+.game-card__cover {
+  display: block;
+  height: 140px;
+}
+
+.game-card__body {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+}
+
+.game-card__title {
+  display: block;
+  font: var(--text-h4);
+}
+
+.game-card:hover .game-card__title {
+  color: var(--color-amber-flame);
+}
+
+.game-card__genre {
+  display: block;
+  font: var(--text-caption);
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.game-card__score {
+  font: var(--text-score-card);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Reviews point at the game page that holds their sources. */
+.article-crosslink {
+  margin: var(--space-8) 0 0;
+  font: var(--text-body);
+  font-weight: 600;
+}
+
+/* ---------- Game page responsive ---------- */
+
+@media (max-width: 1100px) {
+  .game-main {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-12);
+  }
+
+  .game-rail {
+    position: static;
+  }
+
+  .game-about {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-8);
+  }
+}
+
+@media (max-width: 860px) {
+  .game-hero {
+    min-height: 340px;
+  }
+
+  .game-hero__body {
+    padding: var(--space-8) var(--space-5);
+  }
+
+  .game-strip {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-6);
+  }
+
+  .game-strip__facts {
+    gap: var(--space-6);
+  }
+
+  .game-media__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: 140px;
+  }
+
+  .game-media__tile:first-child {
+    grid-row: span 1;
+  }
+
+  .game-media .section-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .srcrow {
+    grid-template-columns: minmax(0, 1fr) 64px 48px 20px;
+    gap: var(--space-3);
+  }
+
+  .game-sources__title,
+  .game-section__title {
+    font: var(--text-h3);
+  }
+
+  .histogram__bars {
+    height: 120px;
+  }
+}
+
 /* ---------- Responsive ---------- */
 
 @media (max-width: 1100px) {
@@ -2344,7 +2883,9 @@ button {
      to touch so pointer users keep normal text selection inside a card. */
   .review-card__title a::after,
   .guide-card__title a::after,
-  .story__headline a::after {
+  .story__headline a::after,
+  .hero-card__title::after,
+  .rank-row__title a::after {
     content: "";
     position: absolute;
     inset: 0;

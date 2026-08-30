@@ -1,0 +1,97 @@
+---
+import Base from "../layouts/Base.astro";
+import Breadcrumb from "../components/Breadcrumb.astro";
+import { OUTLETS } from "../data/outlets";
+import { LETTER_SCORES, MIN_SOURCES } from "../lib/score";
+
+/**
+ * The arithmetic, published. The claim against Metacritic is that ours is
+ * public, so this page renders the same tables the code uses — it cannot
+ * drift from them.
+ */
+const verdictOutlets = OUTLETS.filter((o) => o.verdicts);
+const letters = Object.entries(LETTER_SCORES);
+---
+
+<Base
+  title="How we score — Sibi Gamers"
+  description={`How Sibi Gamers turns reviews from every outlet into one 0-100 score: the normalization rules, the ${MIN_SOURCES}-source minimum, and what we do not do.`}
+>
+  <Breadcrumb section="Rankings" sectionHref="/" current="How we score" />
+
+  <article class="article">
+    <header class="article-head article-head--text" data-reveal data-reveal-stagger="0.06">
+      <div class="article-head__body">
+        <h1 class="article-head__title" data-reveal-item>How we score</h1>
+        <p class="article-head__standfirst" data-reveal-item>
+          One number per game, computed from every published review we can find, with
+          the arithmetic in the open. Every row on a game page links to the review it
+          came from.
+        </p>
+      </div>
+    </header>
+
+    <div class="article__body prose">
+      <h2>What the number is</h2>
+      <p>
+        The score is the plain mean of every outlet's review, each converted to a
+        0&ndash;100 scale by the rules below. Every outlet counts once, and every
+        outlet counts the same. If an outlet re-scores a game, the newer review
+        replaces the older one rather than joining it.
+      </p>
+      <p>
+        We publish a score once <strong>{MIN_SOURCES} outlets</strong> are on file.
+        Below that we still show every review we have, but no headline number:
+        four opinions are not an aggregate.
+      </p>
+
+      <h2>Converting each scale</h2>
+      <p>Outlets publish on different scales. These are the rules, applied to the letter.</p>
+    </div>
+
+    <dl class="facts">
+      <div class="facts__row"><dt class="facts__label">Out of 10</dt><dd class="facts__value">Multiplied by 10. 9.5/10 becomes 95.</dd></div>
+      <div class="facts__row"><dt class="facts__label">Out of 5</dt><dd class="facts__value">Multiplied by 20. 4.5/5 becomes 90.</dd></div>
+      <div class="facts__row"><dt class="facts__label">Out of 100</dt><dd class="facts__value">Taken as published.</dd></div>
+      <div class="facts__row">
+        <dt class="facts__label">Letter grades</dt>
+        <dd class="facts__value">
+          {letters.map(([grade, value], i) => (
+            <span>{grade} {value}{i < letters.length - 1 ? " · " : ""}</span>
+          ))}
+        </dd>
+      </div>
+    </dl>
+
+    <div class="article__body prose">
+      <h2>Outlets that publish a verdict, not a number</h2>
+      <p>
+        Some publications give a badge instead of a score. Mapping a badge to a number
+        is an editorial judgement, so here is exactly what we use.
+      </p>
+    </div>
+
+    <dl class="facts">
+      {verdictOutlets.map((o) => (
+        <div class="facts__row">
+          <dt class="facts__label">{o.name}</dt>
+          <dd class="facts__value">
+            {Object.entries(o.verdicts ?? {}).map(([badge, value], i, arr) => (
+              <span>{badge} {value}{i < arr.length - 1 ? " · " : ""}</span>
+            ))}
+          </dd>
+        </div>
+      ))}
+    </dl>
+
+    <div class="article__body prose">
+      <h2>What we do not do</h2>
+      <ul>
+        <li>We do not weight outlets. A small site's 8 counts the same as a large one's.</li>
+        <li>We do not include user scores. Those are a different thing and deserve their own number.</li>
+        <li>We do not scrape. Scores are entered by hand from the published review, and every row links to it.</li>
+        <li>We do not round twice. Each review is rounded once when converted; the mean is rounded once when shown.</li>
+      </ul>
+    </div>
+  </article>
+</Base>
