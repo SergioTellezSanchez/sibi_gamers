@@ -8,7 +8,6 @@ platforms: ["PC", "Switch"]
 genre: "Racing"
 studio: "Dry Season"
 hours: "10h"
-sourceCount: 47
 ---
 
 Ten hours spent fighting the car instead of the track, on courses that deserved better.

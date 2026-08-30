@@ -123,9 +123,11 @@ export default function RankingsBoard() {
                       {game.score}
                     </span>
                     <span className="hero-card__score-rule" data-hover-bar />
-                    <span className="hero-card__score-caption">
-                      based on {game.sourceCount} sources
-                    </span>
+                    {game.sourceCount != null && (
+                      <span className="hero-card__score-caption">
+                        based on {game.sourceCount} sources
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

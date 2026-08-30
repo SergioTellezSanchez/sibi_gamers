@@ -8,7 +8,6 @@ platforms: ["PC", "Xbox", "Switch"]
 genre: "Roguelike"
 studio: "Foldtable"
 hours: "31h"
-sourceCount: 38
 ---
 
 Every run teaches you one more sentence of a language you did not know the game was speaking.

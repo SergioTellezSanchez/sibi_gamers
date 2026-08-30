@@ -6,6 +6,10 @@
  * that one function — no component touches these arrays directly.
  */
 
+import { aggregate, resolve } from "../lib/score";
+import { OUTLETS_BY_ID } from "./outlets";
+import { rowsForGame } from "./scores";
+
 export const CURRENT_YEAR = 2026;
 
 export type Game = {
@@ -21,7 +25,11 @@ export type Game = {
   budget: string;
   genre: string;
   length: string;
-  sourceCount: number;
+  /**
+   * Absent unless real score rows back it. A count with nothing behind it is
+   * a false claim on the most important number on the page (SCHEMA.md §5).
+   */
+  sourceCount?: number;
 };
 
 export type TopGame = {
@@ -30,7 +38,7 @@ export type TopGame = {
   platforms: string[];
   genres: string[];
   score: number;
-  sourceCount: number;
+  sourceCount?: number;
 };
 
 export type NewsItem = {
@@ -78,7 +86,6 @@ const TOP_GAMES: TopGame[] = [
     platforms: ["PC", "PS5"],
     genres: ["Action RPG"],
     score: 94,
-    sourceCount: 51,
   },
   {
     rank: 2,
@@ -86,7 +93,6 @@ const TOP_GAMES: TopGame[] = [
     platforms: ["PC", "Xbox", "Switch"],
     genres: ["Roguelike"],
     score: 91,
-    sourceCount: 38,
   },
   {
     rank: 3,
@@ -94,12 +100,25 @@ const TOP_GAMES: TopGame[] = [
     platforms: ["PS5", "Xbox"],
     genres: ["Racing"],
     score: 89,
-    sourceCount: 44,
   },
 ];
 
-/** Seed rows carry no `sourceCount`; `getYearData` derives it. */
 type SeedGame = Omit<Game, "sourceCount">;
+
+/**
+ * The only source of a source count. Three games are seeded in `scores.ts`;
+ * everything else returns undefined and renders without the caption, which is
+ * the honest outcome — we have no sources for them yet.
+ */
+export function sourceCountFor(title: string): number | undefined {
+  const a = aggregate(resolve(rowsForGame(gameId(title)), OUTLETS_BY_ID));
+  return a.published ? a.count : undefined;
+}
+
+/** Titles map to score-row ids by the same slug rule the routes use. */
+export function gameId(title: string): string {
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
 
 const RANKED_GAMES: SeedGame[] = [
   { rank: 4, title: "Cinder Watch", date: "Mar", platforms: ["PC", "PS5"], score: 88, studio: "Vault Nine", country: "Sweden", director: "M. Lindqvist", budget: "$48M", genre: "Stealth action", length: "24h" },
@@ -198,17 +217,16 @@ export type YearData = {
  * reproducible ranking. Replace with a real fetch when the API exists.
  */
 export function getYearData(year: number): YearData {
-  const withYear = (g: SeedGame, sourceCount: number): Game => ({
+  const withYear = (g: SeedGame): Game => ({
     ...g,
     date: `${g.date} ${year}`,
-    sourceCount,
+    sourceCount: sourceCountFor(g.title),
   });
 
   if (year === CURRENT_YEAR) {
     return {
-      topGames: TOP_GAMES.map((g) => ({ ...g })),
-      // Source counts in the seed data are decorative; derive them stably.
-      rankedGames: RANKED_GAMES.map((g, i) => withYear(g, 28 + ((i * 7) % 24))),
+      topGames: TOP_GAMES.map((g) => ({ ...g, sourceCount: sourceCountFor(g.title) })),
+      rankedGames: RANKED_GAMES.map(withYear),
     };
   }
 
@@ -216,8 +234,10 @@ export function getYearData(year: number): YearData {
   const pool = shuffled([...TOP_GAMES.map(toSeedGame), ...RANKED_GAMES], rand);
 
   // Re-sort by the jittered score so rank order still reads as a ranking.
+  // These rows carry no source count at all: the scores are PRNG output, so
+  // there is nothing to count and claiming a number would be inventing one.
   const scored = pool
-    .map((g) => withYear(g, 24 + Math.floor(rand() * 34)))
+    .map((g): Game => ({ ...g, date: `${g.date} ${year}` }))
     .map((g) => ({ ...g, score: clampScore(g.score + Math.round((rand() - 0.5) * 18)) }))
     .sort((a, b) => b.score - a.score)
     .map((g, i): Game => ({ ...g, rank: i + 1 }));
@@ -230,7 +250,6 @@ export function getYearData(year: number): YearData {
         platforms: g.platforms,
         genres: [g.genre],
         score: g.score,
-        sourceCount: g.sourceCount,
       }),
     ),
     rankedGames: scored.slice(3),

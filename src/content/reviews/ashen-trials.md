@@ -8,7 +8,6 @@ platforms: ["PC", "PS5"]
 genre: "Action RPG"
 studio: "Vault Nine"
 hours: "42h"
-sourceCount: 51
 lead: true
 ---
 

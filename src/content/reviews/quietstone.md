@@ -8,7 +8,6 @@ platforms: ["PC", "Switch"]
 genre: "Adventure"
 studio: "Northlight Craft"
 hours: "12h"
-sourceCount: 39
 ---
 
 The midpoint asks you to walk the same three valleys until the story catches up with the map.

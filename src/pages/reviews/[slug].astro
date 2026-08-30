@@ -4,7 +4,7 @@ import Base from "../../layouts/Base.astro";
 import ArticleShell from "../../components/ArticleShell.astro";
 import ScoreDisplay from "../../components/ScoreDisplay.astro";
 import Tag from "../../components/Tag.astro";
-import { GRADIENTS } from "../../data/games";
+import { GRADIENTS, sourceCountFor } from "../../data/games";
 
 export async function getStaticPaths() {
   const all = await getCollection("reviews");
@@ -26,12 +26,16 @@ const fmt = (date: Date) =>
 
 const cover = GRADIENTS[entry.id.length % GRADIENTS.length];
 
+// The review slug is the game id, so the aggregate comes from the same rows
+// the game page will use. Undefined where we have no sources yet.
+const sourceCount = sourceCountFor(d.title);
+
 const facts = [
   ["Studio", d.studio],
   ["Genre", d.genre],
   ["Platforms", d.platforms.join(", ")],
   ["Length", d.hours],
-  ["Sources", `${d.sourceCount}`],
+  ...(sourceCount == null ? [] : [["Sources", `${sourceCount}`]]),
 ];
 
 const schema = {
@@ -81,7 +85,7 @@ const schema = {
             <span class="byline__name">{d.critic}</span>
             <span class="byline__date">{fmt(d.date)} · {d.studio} · {d.hours}</span>
           </div>
-          <ScoreDisplay score={d.score} size="hero" sourceCount={d.sourceCount} />
+          <ScoreDisplay score={d.score} size="hero" sourceCount={sourceCount} />
         </div>
       </div>
     </header>

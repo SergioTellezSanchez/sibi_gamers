@@ -8,7 +8,6 @@ platforms: ["PC", "PS5"]
 genre: "Mystery"
 studio: "Ninth Parallel"
 hours: "16h"
-sourceCount: 50
 ---
 
 The town is superb. The case you are there to solve is a series of locked doors and convenient notes.
