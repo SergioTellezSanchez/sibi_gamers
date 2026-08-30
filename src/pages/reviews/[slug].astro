@@ -1,0 +1,106 @@
+---
+import { getCollection, render } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import ArticleShell from "../../components/ArticleShell.astro";
+import ScoreDisplay from "../../components/ScoreDisplay.astro";
+import Tag from "../../components/Tag.astro";
+import { GRADIENTS } from "../../data/games";
+
+export async function getStaticPaths() {
+  const all = await getCollection("reviews");
+  // Newest first, so prev/next reads the same direction as the index grid.
+  const ordered = all.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+  return ordered.map((entry, i) => ({
+    params: { slug: entry.id },
+    props: { entry, prev: ordered[i - 1], next: ordered[i + 1] },
+  }));
+}
+
+const { entry, prev, next } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+
+const fmt = (date: Date) =>
+  date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+
+const cover = GRADIENTS[entry.id.length % GRADIENTS.length];
+
+const facts = [
+  ["Studio", d.studio],
+  ["Genre", d.genre],
+  ["Platforms", d.platforms.join(", ")],
+  ["Length", d.hours],
+  ["Sources", `${d.sourceCount}`],
+];
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "Review",
+  headline: d.title,
+  datePublished: d.date.toISOString(),
+  author: { "@type": "Person", name: d.critic },
+  publisher: { "@type": "Organization", name: "Sibi Gamers" },
+  itemReviewed: { "@type": "VideoGame", name: d.title, gamePlatform: d.platforms },
+  reviewRating: {
+    "@type": "Rating",
+    ratingValue: d.score,
+    bestRating: 100,
+    worstRating: 0,
+  },
+};
+---
+
+<Base
+  title={`${d.title} review — Sibi Gamers`}
+  description={d.verdict}
+  ogType="article"
+>
+  <ArticleShell
+    section="Reviews"
+    sectionHref="/reviews/"
+    current={d.title}
+    prev={prev && { href: `/reviews/${prev.id}/`, title: prev.data.title }}
+    next={next && { href: `/reviews/${next.id}/`, title: next.data.title }}
+  >
+    <header class="article-head" slot="header" data-reveal data-reveal-stagger="0.06">
+      <div class="article-head__cover" style={`background:${cover}`} aria-hidden="true">
+      </div>
+
+      <div class="article-head__body">
+        <div class="article-head__tags" data-reveal-item>
+          <Tag tone="accent">{d.genre}</Tag>
+          {d.platforms.map((p) => <Tag>{p}</Tag>)}
+        </div>
+
+        <h1 class="article-head__title" data-reveal-item>{d.title}</h1>
+        <p class="article-head__standfirst" data-reveal-item>{d.verdict}</p>
+
+        <div class="article-head__footer" data-reveal-item>
+          <div class="byline">
+            <span class="byline__name">{d.critic}</span>
+            <span class="byline__date">{fmt(d.date)} · {d.studio} · {d.hours}</span>
+          </div>
+          <ScoreDisplay score={d.score} size="hero" sourceCount={d.sourceCount} />
+        </div>
+      </div>
+    </header>
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    <dl class="facts" data-reveal data-reveal-stagger="0.04">
+      {
+        facts.map(([label, value]) => (
+          <div class="facts__row" data-reveal-item>
+            <dt class="facts__label">{label}</dt>
+            <dd class="facts__value">{value}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </ArticleShell>
+
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} is:inline />
+</Base>

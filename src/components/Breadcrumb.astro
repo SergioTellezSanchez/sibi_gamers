@@ -1,0 +1,21 @@
+---
+/**
+ * Article trail: Home / Section / current title. The last crumb is plain text,
+ * not a link — it is the page you are already on.
+ */
+interface Props {
+  section: string;
+  sectionHref: string;
+  current: string;
+}
+
+const { section, sectionHref, current } = Astro.props;
+---
+
+<nav class="crumbs" aria-label="Breadcrumb">
+  <ol class="crumbs__list">
+    <li class="crumbs__item"><a href="/">Sibi Gamers</a></li>
+    <li class="crumbs__item"><a href={sectionHref}>{section}</a></li>
+    <li class="crumbs__item crumbs__item--current" aria-current="page">{current}</li>
+  </ol>
+</nav>

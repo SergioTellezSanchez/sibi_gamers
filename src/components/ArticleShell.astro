@@ -1,0 +1,36 @@
+---
+import Breadcrumb from "./Breadcrumb.astro";
+import ArticleNav from "./ArticleNav.astro";
+
+/**
+ * Shared scaffolding for every editorial detail page. The three sections
+ * differ only in their masthead, so that part arrives through the `header`
+ * slot while the trail, measure and prev/next stay identical.
+ */
+interface Link {
+  href: string;
+  title: string;
+}
+
+interface Props {
+  section: string;
+  sectionHref: string;
+  current: string;
+  prev?: Link;
+  next?: Link;
+}
+
+const { section, sectionHref, current, prev, next } = Astro.props;
+---
+
+<Breadcrumb section={section} sectionHref={sectionHref} current={current} />
+
+<article class="article">
+  <slot name="header" />
+
+  <div class="article__body">
+    <slot />
+  </div>
+</article>
+
+<ArticleNav prev={prev} next={next} />

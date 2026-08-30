@@ -23,13 +23,9 @@ const TYPES = [
   "Endgame",
 ] as const;
 
-const POPULAR = [
-  { title: "Ashen Trials: stat priorities cheat sheet", views: "184k" },
-  { title: "Hollow Vector: relic tier list, season 3", views: "142k" },
-  { title: "Driftbound: the ten-minute setup guide", views: "97k" },
-  { title: "Loam: crop profit table, year one", views: "88k" },
-  { title: "Cinder Watch: all silent takedown tools", views: "71k" },
-];
+// Real guides, so every link resolves. The sub-label shows read time from the
+// frontmatter rather than invented view counts.
+const POPULAR = rest.slice(0, 5);
 ---
 
 <Base
@@ -53,7 +49,7 @@ const POPULAR = [
 
         <div class="guide-card__game">{lead.data.game}</div>
         <h2 class="lead__title">
-          <a href="#">{lead.data.title}</a>
+          <a href={`/guides/${lead.id}/`}>{lead.data.title}</a>
         </h2>
         <p class="lead__excerpt">{lead.data.summary}</p>
 
@@ -62,7 +58,7 @@ const POPULAR = [
             {lead.data.chapters.map((chapter, i) => (
               <li class="chapters__item">
                 <span class="chapters__num">{String(i + 1).padStart(2, "0")}</span>
-                <a href="#" class="chapters__link">
+                <a href={`/guides/${lead.id}/`} class="chapters__link">
                   {chapter}
                 </a>
               </li>
@@ -91,6 +87,7 @@ const POPULAR = [
         {
           rest.map((guide, i) => (
             <GuideCard
+              href={`/guides/${guide.id}/`}
               title={guide.data.title}
               game={guide.data.game}
               summary={guide.data.summary}
@@ -115,10 +112,10 @@ const POPULAR = [
             <li class="rail__item">
               <span class="rail__num">{String(i + 1).padStart(2, "0")}</span>
               <span>
-                <a href="#" class="rail__link">
-                  {item.title}
+                <a href={`/guides/${item.id}/`} class="rail__link">
+                  {item.data.title}
                 </a>
-                <span class="rail__sub">{item.views} reads</span>
+                <span class="rail__sub">{item.data.readTime}</span>
               </span>
             </li>
           ))

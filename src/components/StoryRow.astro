@@ -2,6 +2,7 @@
 import { GRADIENTS } from "../data/games";
 
 interface Props {
+  href: string;
   headline: string;
   standfirst: string;
   source: string;
@@ -10,7 +11,8 @@ interface Props {
   index: number;
 }
 
-const { headline, standfirst, source, category, displayDate, index } = Astro.props;
+const { href, headline, standfirst, source, category, displayDate, index } =
+  Astro.props;
 ---
 
 <li class="story" data-reveal-item data-filter-value={category}>
@@ -25,7 +27,7 @@ const { headline, standfirst, source, category, displayDate, index } = Astro.pro
       <span class="story__dot">·</span>
       <span class="story__category">{category}</span>
     </div>
-    <h3 class="story__headline"><a href="#">{headline}</a></h3>
+    <h3 class="story__headline"><a href={href}>{headline}</a></h3>
     <p class="story__standfirst">{standfirst}</p>
     <div class="story__date">{displayDate}</div>
   </div>

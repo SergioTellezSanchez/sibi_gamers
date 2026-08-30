@@ -1,0 +1,98 @@
+---
+import { getCollection, render } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import ArticleShell from "../../components/ArticleShell.astro";
+import Tag from "../../components/Tag.astro";
+import { GRADIENTS } from "../../data/games";
+
+export async function getStaticPaths() {
+  const all = await getCollection("guides");
+  // Guides are curated, not chronological: `order` is the editorial sequence.
+  const ordered = all.sort((a, b) => a.data.order - b.data.order);
+
+  return ordered.map((entry, i) => ({
+    params: { slug: entry.id },
+    props: { entry, prev: ordered[i - 1], next: ordered[i + 1] },
+  }));
+}
+
+const { entry, prev, next } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+
+const stripe = GRADIENTS[entry.id.length % GRADIENTS.length];
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  name: d.title,
+  description: d.summary,
+  author: { "@type": "Person", name: d.author },
+  publisher: { "@type": "Organization", name: "Sibi Gamers" },
+  ...(d.chapters
+    ? { step: d.chapters.map((c) => ({ "@type": "HowToStep", name: c })) }
+    : {}),
+};
+---
+
+<Base
+  title={`${d.title} — ${d.game} guide — Sibi Gamers`}
+  description={d.summary}
+  ogType="article"
+>
+  <ArticleShell
+    section="Guides"
+    sectionHref="/guides/"
+    current={d.title}
+    prev={prev && { href: `/guides/${prev.id}/`, title: prev.data.title }}
+    next={next && { href: `/guides/${next.id}/`, title: next.data.title }}
+  >
+    <header class="article-head article-head--text" slot="header" data-reveal data-reveal-stagger="0.06">
+      <span class="article-head__stripe" style={`background:${stripe}`} aria-hidden="true"
+      ></span>
+
+      <div class="article-head__body">
+        <div class="guide-card__game" data-reveal-item>{d.game}</div>
+        <h1 class="article-head__title" data-reveal-item>{d.title}</h1>
+        <p class="article-head__standfirst" data-reveal-item>{d.summary}</p>
+
+        <div class="article-head__tags" data-reveal-item>
+          <Tag tone="accent">{d.type}</Tag>
+          <Tag>{d.difficulty}</Tag>
+          <Tag>{d.readTime}</Tag>
+        </div>
+
+        <div class="article-head__footer" data-reveal-item>
+          <div class="byline">
+            <span class="byline__name">{d.author}</span>
+            <span class="byline__date">Updated {d.updated}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    {
+      d.chapters && (
+        <section class="contents" aria-labelledby="contents-heading">
+          <h2 class="contents__heading eyebrow" id="contents-heading">
+            In this guide
+          </h2>
+          <ol class="contents__list">
+            {d.chapters.map((chapter, i) => (
+              <li class="contents__item">
+                <span class="contents__num">{String(i + 1).padStart(2, "0")}</span>
+                <span class="contents__label">{chapter}</span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )
+    }
+
+    <div class="prose">
+      <Content />
+    </div>
+  </ArticleShell>
+
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} is:inline />
+</Base>

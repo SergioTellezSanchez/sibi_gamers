@@ -3,6 +3,7 @@ import { GRADIENTS } from "../data/games";
 import Tag from "./Tag.astro";
 
 interface Props {
+  href: string;
   title: string;
   game: string;
   summary: string;
@@ -13,7 +14,8 @@ interface Props {
   index: number;
 }
 
-const { title, game, summary, type, difficulty, readTime, updated, index } = Astro.props;
+const { href, title, game, summary, type, difficulty, readTime, updated, index } =
+  Astro.props;
 ---
 
 <article class="guide-card" data-reveal-item data-hover-lift data-filter-value={type}>
@@ -24,7 +26,7 @@ const { title, game, summary, type, difficulty, readTime, updated, index } = Ast
 
   <div class="guide-card__body">
     <div class="guide-card__game">{game}</div>
-    <h3 class="guide-card__title"><a href="#">{title}</a></h3>
+    <h3 class="guide-card__title"><a href={href}>{title}</a></h3>
     <p class="guide-card__summary">{summary}</p>
 
     <div class="guide-card__tags">

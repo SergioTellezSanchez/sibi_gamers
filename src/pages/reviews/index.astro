@@ -51,7 +51,7 @@ const fmt = (d: Date) =>
         </div>
 
         <h2 class="lead__title">
-          <a href="#">{lead.data.title}</a>
+          <a href={`/reviews/${lead.id}/`}>{lead.data.title}</a>
         </h2>
         <p class="lead__verdict">{lead.data.verdict}</p>
         <p class="lead__excerpt">{lead.body}</p>
@@ -85,6 +85,7 @@ const fmt = (d: Date) =>
     {
       rest.map((review, i) => (
         <ReviewCard
+          href={`/reviews/${review.id}/`}
           title={review.data.title}
           score={review.data.score}
           verdict={review.data.verdict}

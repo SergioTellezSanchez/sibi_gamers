@@ -17,13 +17,9 @@ const stories = all
 const CATEGORIES = ["All", "Industry", "Releases", "Patches", "Esports"] as const;
 const BUCKETS = ["Today", "Yesterday", "Earlier this week"] as const;
 
-const TRENDING = [
-  "Ashen Trials review roundup: the year's highest aggregate",
-  "Every Driftbound season two track, ranked",
-  "Why Static Fields' demo strategy worked",
-  "The Cinder Watch Switch delay, explained",
-  "Loam's four-day week, one year on",
-];
+// The rail points at real stories rather than standalone copy, so every link
+// resolves. Ordering is a placeholder for real popularity data.
+const TRENDING = stories.slice(0, 5);
 ---
 
 <Base
@@ -45,7 +41,7 @@ const TRENDING = [
         </div>
 
         <h2 class="lead__title">
-          <a href="#">{lead.data.headline}</a>
+          <a href={`/news/${lead.id}/`}>{lead.data.headline}</a>
         </h2>
         <p class="lead__excerpt">{lead.data.standfirst}</p>
 
@@ -72,6 +68,7 @@ const TRENDING = [
               <ul class="list">
                 {inBucket.map((story, i) => (
                   <StoryRow
+                    href={`/news/${story.id}/`}
                     headline={story.data.headline}
                     standfirst={story.data.standfirst}
                     source={story.data.source}
@@ -98,8 +95,8 @@ const TRENDING = [
           TRENDING.map((item, i) => (
             <li class="rail__item">
               <span class="rail__num">{String(i + 1).padStart(2, "0")}</span>
-              <a href="#" class="rail__link">
-                {item}
+              <a href={`/news/${item.id}/`} class="rail__link">
+                {item.data.headline}
               </a>
             </li>
           ))
