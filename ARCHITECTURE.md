@@ -98,6 +98,18 @@ The split is deliberate:
   curated source table. It lives in TypeScript today and must not be disguised
   as Markdown.
 
+### The score module
+
+`src/lib/score/` turns per-outlet rows into an aggregate: `normalize.ts` maps a
+published verdict onto 0-100, `aggregate.ts` derives count, mean, median,
+histogram and band from one deduped row set. Nothing is stored, so the numbers
+on a page cannot drift apart from the rows behind them.
+
+The rule that matters: **a source count only ever comes from
+`sourceCountFor()`**, which counts real rows. Three games are seeded; the rest
+render with no count rather than an invented one. Model, thresholds and what is
+still placeholder: [SCHEMA.md](SCHEMA.md) §4.
+
 ## 7. The design system boundary
 
 `src/ds/tokens/*.css` are a **literal copy** from the Claude Design project.
@@ -192,9 +204,12 @@ modes caused every overflow found and are worth recognising on sight:
 
 ```bash
 pnpm build    # astro check (typecheck) && astro build → dist/
+pnpm test     # vitest — the score model's arithmetic
 ```
 
-`astro check` runs first, so a type error fails the build.
+`astro check` runs first, so a type error fails the build. `pnpm test` is not
+wired into `build`; it covers `src/lib/score/`, where the failure mode is a
+wrong number rather than a type error.
 
 `@astrojs/vercel` is installed and wired in `astro.config.mjs`, so a route can
 opt into SSR with `export const prerender = false`. None does yet, which is why
@@ -218,16 +233,20 @@ Break these and the model breaks with them:
 3. Never hand-edit `src/ds/tokens/`.
 4. Never make motion load-bearing — the page must read correctly with JS off.
 5. Never put game/score data in Markdown; it comes from APIs.
+6. Never author a source count. It comes from `sourceCountFor()` counting real
+   rows, or the page renders without it.
 
 ## 13. Known gaps
 
-- **No game detail page.** The design is chosen (direction A) but not built, and
-  it is blocked on the score data model. Every game link in the islands still
-  points at `#`, and those links are also the only remaining sub-44px touch
-  targets.
-- **No score system.** Reviews carry a single `critic` and a `sourceCount`, and
-  the page prints "based on 51 sources" with no source table behind it. The
-  aggregate is currently a claim, not a computation. See SCHEMA.md §4.
+- **No game detail page.** The design is chosen (direction A) and the score
+  model it was blocked on now exists, so this is the next thing to build. Every
+  game link in the islands still points at `#`, and those links are also the
+  only remaining sub-44px touch targets.
+- **No real score data.** The score model is built and tested
+  (`src/lib/score/`), but the rows feeding it are invented: 133 placeholder
+  scores across three games, attributed to real outlets for games that do not
+  exist. Curating real scores is manual work that has not started. See
+  SCHEMA.md §4.
 - **All copy is placeholder.** Every verdict, headline, critic and studio name is
   invented and must be replaced before launch.
 - **Three dead data modules.** `src/data/reviews.ts`, `news.ts` and `guides.ts`

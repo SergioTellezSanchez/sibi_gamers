@@ -85,6 +85,9 @@ Portal de videojuegos con tres pilares de contenido y un diferenciador central:
       columnas para tablet en el top 3, objetivos táctiles de 44px vía `pointer: coarse`,
       y el contenedor crece a 1440/1560px por encima de 1600/2100px
 - [x] **Adapter de deploy** (`@astrojs/vercel`) — desplegado en https://sibi-gamers.vercel.app; ninguna ruta usa SSR todavía
+- [x] **Sistema de score** (`src/lib/score/`) — normalización de cualquier escala a
+      0-100 y agregados (media, mediana, histograma) derivados de las filas, nunca
+      almacenados. 16 tests con `pnpm test`. Falta la curación de datos reales
 - [ ] Endpoint `/api/recommend` con la API de Claude (reservado, requiere adapter)
 - [ ] Página de detalle de juego (cuando llegue el diseño de Fase 2)
 - [ ] Base de datos de juegos alimentada por APIs (RAWG, IGDB) para metadata e imágenes
@@ -329,12 +332,14 @@ Use invented placeholder data consistent with the homepage (e.g., Ashen Trials,
 
 ## 8d. Plan de datos (sistema de score)
 
-> El modelo propuesto (`Game` / `Outlet` / `Score`, reglas de normalización y
-> qué falta) está desarrollado en [SCHEMA.md](SCHEMA.md) §4.
+> **Ya construido** en `src/lib/score/`. El modelo, las reglas de normalización
+> publicables, los umbrales y lo que sigue faltando están en
+> [SCHEMA.md](SCHEMA.md) §4. Lo de abajo es el plan original y se mantiene como
+> registro de las restricciones de origen.
 
 - **Metadata e imágenes:** IGDB API (vía cuenta dev de Twitch, gratis) + RAWG API. Alimentan nombres, portadas, screenshots, géneros, plataformas, estudios — y el feature de imágenes HQ.
 - **Scores por fuente (MVP):** curación semiautomatizada de los 20-30 juegos top de 2026. Por juego: score de 10-15 outlets (IGN, GameSpot, PC Gamer, Eurogamer, Polygon…) + URL de la reseña original. Sin scraping masivo que viole ToS; los scores son datos factuales y siempre se enlaza a la fuente (modelo AOTY/OpenCritic). Respaldo: `aggregated_rating` de IGDB.
-- **Normalización:** 9/10 → 90 · 4/5 → 80 · letter grades (B+ → 78, etc.) · definir mínimo de fuentes para publicar score.
+- **Normalización:** resuelta. 9/10 → 90 · 4/5 → 80 · letras sobre 95/85/75/65 para A/B/C/D con ±3 según el sufijo (B+ → 88) · **mínimo de 5 fuentes** para publicar score, igual que OpenCritic. Sin ponderación por outlet en el MVP.
 - **Página "How we score":** metodología pública (fuentes, normalización, promedio). Bandera de transparencia contra la opacidad de Metacritic.
 - **Pendiente:** crear cuentas en dev.twitch.tv (IGDB) y rawg.io/apidocs; definir modelo de datos (games, sources, reviews) antes de Claude Code.
 
@@ -402,6 +407,10 @@ src/
 **Deuda conocida:**
 - El adapter ya está, pero ninguna ruta ha optado por SSR: el recomendador sigue
   sirviendo desde un banco estático hasta que exista `/api/recommend`.
+- Los 133 scores por outlet son inventados y se atribuyen a publicaciones reales
+  sobre juegos que no existen. La aritmética sí es real y está testeada; las filas
+  no. Curar datos reales (20-30 juegos, 10-15 outlets cada uno) es trabajo manual
+  que no ha empezado.
 - `site` apunta a `sibigamers.gg`, dominio que aún no está conectado al deploy: todos
   los canonical y OG del sitio en vivo señalan a una URL que no resuelve. Aplazado a
   propósito; hay que resolverlo antes de pedir indexación.
@@ -434,5 +443,7 @@ src/
 | Ago 2026 | Contenido editorial (reviews, noticias, guías) en Markdown vía content collections con esquemas Zod. Los datos de juegos siguen en TypeScript porque vendrán de IGDB/RAWG |
 | Ago 2026 | Reviews / News / Guides se construyen **code-first** sobre el design system, sin esperar re-derivación en Claude Design. La página de detalle de juego SÍ pasa por Design→Code por ser la página de ingresos |
 | Ago 2026 | **Plantilla de artículo en código, no en Claude Design.** Fase 2 la listaba como entregable de diseño, pero se resolvió por el precedente de los índices: lo editorial se construye code-first sobre el design system y solo la página de juego pasa por Design→Code. Desbloquea 34 artículos que ya existían en Markdown pero no tenían ruta |
+| Ago 2026 | **Score mínimo de 5 fuentes para publicar**, igual que OpenCritic, y **sin ponderación por outlet** en el MVP (`weight` existe pero se ignora, para no migrar datos después). Una reseña revisada reemplaza a la original: una fila por outlet, gana la más reciente |
+| Ago 2026 | **`sourceCount` deja de escribirse a mano.** Sale de `sourceCountFor()`, que cuenta filas reales, o no se renderiza. Los 17 juegos sin filas dejaron de mostrar un número inventado, y el campo salió del frontmatter de las reseñas: la reseña es un crítico, el agregado es del juego |
 | Ago 2026 | **Gestor de paquetes: pnpm** (`packageManager` fijado, `pnpm-workspace.yaml` con `allowBuilds: esbuild`). Se descartó npm; el lockfile se regeneró desde cero |
 | Ago 2026 | GSAP se carga en idle y no se carga con reduced-motion: el motion es aditivo, nunca requisito para leer |

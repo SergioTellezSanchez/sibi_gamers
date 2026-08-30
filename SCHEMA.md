@@ -8,17 +8,21 @@ as placeholder data · `PROPOSED` does not exist in code.
 
 ---
 
-## 1. The two data layers
+## 1. The data layers
 
 | Layer | Lives in | Source of truth | Status |
 | --- | --- | --- | --- |
 | Editorial — reviews, news, guides | `src/content/**/*.md` | Markdown, written by people | LIVE |
 | Homepage game seed | `src/data/games.ts` | hand-written TypeScript | SEED |
-| Aggregated score + sources | *nothing yet* | IGDB/RAWG + curated outlet table | PROPOSED |
+| Outlet table | `src/data/outlets.ts` | hand-written, 53 outlets | SEED |
+| Per-outlet scores | `src/data/scores.ts` | hand-written, 3 games, 133 rows | SEED |
+| Aggregates (mean, median, histogram) | `src/lib/score/` | derived, never stored | LIVE |
+| Game metadata + art | *nothing yet* | IGDB/RAWG | PROPOSED |
 
 The split is deliberate: editorial content is Markdown because humans write it;
 game data is not, because it will arrive from APIs and must not be disguised as
-prose.
+prose. Aggregates get their own row because they are computed on every read and
+stored nowhere — see §5 rule 2.
 
 ---
 
@@ -43,8 +47,12 @@ The **filename is the slug**: `src/content/reviews/ashen-trials.md` →
 | `genre` | string | rendered as the accent tag |
 | `studio` | string | |
 | `hours` | string | e.g. `"42h"` — free text, not a number |
-| `sourceCount` | number | printed as "based on N sources"; **currently decorative** |
 | `lead` | boolean = false | at most one; renders as the hero feature |
+
+There is deliberately **no `sourceCount` field**. A review is one critic; the
+aggregate belongs to the game. The page derives it from `src/data/scores.ts`
+via `sourceCountFor()`, keyed by the slug, so the printed count is always the
+number of rows behind it. Reviews of games with no rows print no count.
 
 ### `news` — 11 entries
 
@@ -101,8 +109,8 @@ a real fetch means rewriting that one function.
 
 ```ts
 Game            { rank, title, date, platforms[], score, studio, country,
-                  director, budget, genre, length, sourceCount }
-TopGame         { rank, title, platforms[], genres[], score, sourceCount }
+                  director, budget, genre, length, sourceCount? }
+TopGame         { rank, title, platforms[], genres[], score, sourceCount? }
 NewsItem        { source, headline, date }
 ReviewItem      { title, excerpt, score }
 Recommendation  { title, reason, score }
@@ -115,9 +123,14 @@ Also exported: `CURRENT_YEAR` (2026), `GRADIENTS` (cover fills from the ember
 ramp), `DECADES`, `STOREFRONTS`, `REC_BANK` (the static recommender responses
 standing in for `/api/recommend`).
 
+`sourceCount` is optional and never authored. `sourceCountFor(title)` derives
+it from `src/data/scores.ts`, so only the three seeded games carry one; the
+other 17 render without the caption.
+
 Years other than 2026 are **generated**: the seed is reshuffled with a
 year-seeded PRNG and scores are nudged, so the picker produces a distinct but
-reproducible ranking. None of it is real data.
+reproducible ranking. None of it is real data, and none of those rows carries a
+source count — there is nothing to count.
 
 `NewsItem` and `ReviewItem` here duplicate what the `news` and `reviews`
 collections already hold. They feed the homepage digest columns and should be
@@ -131,50 +144,44 @@ collections. Safe to delete.
 
 ---
 
-## 4. Aggregated score model — PROPOSED, not built
+## 4. Aggregated score model — BUILT, on placeholder rows
 
-**This does not exist in code.** It is the gap between what the site claims and
-what it computes, and it blocks the game detail page.
+The arithmetic exists and is tested. The data behind it does not: the outlets
+are real publications, the scores attributed to them are invented, and the
+games do not exist.
 
-Today a review carries one `critic`, one `verdict`, and a `sourceCount` of e.g.
-51 — and the page prints "based on 51 sources" with no source table behind it.
-The AOTY-style breakdown is the product's core differentiator and has no data
-model yet.
+### What is built — `src/lib/score/`
 
-Master doc §8d sets the constraints: no mass scraping (ToS), scores are factual
-data, always link the original review, IGDB `aggregated_rating` as a fallback.
+| File | Does |
+| --- | --- |
+| `types.ts` | `Outlet` and `ScoreRow`, with Zod schemas parsed at module load |
+| `normalize.ts` | native scale to 0-100, by the published table below |
+| `aggregate.ts` | count, mean, median, histogram, band, publish threshold |
 
-### Proposed shape
+`src/lib/score/score.test.ts` covers it — `pnpm test`.
 
 ```ts
-Game {
-  id            // internal slug, e.g. "ashen-trials"
-  igdbId?       // IGDB id
-  rawgId?       // RAWG id
-  title, studio, country, director, budget
-  releaseDate, platforms[], genres[]
-  coverUrl, screenshots[]        // from IGDB/RAWG
-}
-
-Outlet {
-  id            // "ign", "eurogamer"
-  name
-  scale         // "10-point" | "5-star" | "letter" | "100-point" | "verdict"
-  weight        // reserved; MVP treats every outlet equally
-}
-
-Score {
-  gameId, outletId
-  native        // as published: "9/10", "4.5/5", "B+", "Essential"
-  normalized    // 0-100, by the published rule below
-  reviewUrl     // required — the transparency claim depends on it
-  publishedAt
-  critic?
-}
+Outlet  { id, name, scale, weight, verdicts? }
+ScoreRow { gameId, outletId, native, reviewUrl, publishedAt, critic?, supersedes? }
 ```
 
-Derived per game, never stored: `mean`, `median`, `count`, `distribution`
-(histogram buckets), `band` (from `scoreColor.ts`).
+`mean`, `median`, `count`, `distribution` and `band` all come out of one
+`aggregate()` call on one deduped row set, so they cannot disagree. Nothing is
+stored.
+
+### Decisions taken
+
+- **Minimum 5 sources** (`MIN_SOURCES`) before a headline score publishes,
+  matching OpenCritic. Under it `published` is false and the caller must hide
+  the number; the breakdown table still renders, because the reviews are real
+  evidence even when the aggregate is not yet meaningful.
+- **No weighting.** Every outlet counts once. `Outlet.weight` exists and is
+  ignored, so weighting can arrive without a data migration.
+- **A revision replaces its original.** `aggregate()` keeps one row per outlet,
+  latest `publishedAt` wins, so re-scoring can never double-count.
+- **Buckets are five wide**, with 100 in a bucket of its own, trimmed to the
+  populated range. On the seeded Ashen Trials rows this reproduces the chosen
+  design's five columns exactly.
 
 ### Normalization rules
 
@@ -183,26 +190,38 @@ the arithmetic is public.
 
 | Native scale | Rule | Example |
 | --- | --- | --- |
-| N/10 | `N × 10` | 9/10 → 90 |
+| N/10 | `N × 10` | 9.5/10 → 95 |
 | N/5 | `N × 20` | 4.5/5 → 90 |
 | N/100 | identity | 94 → 94 |
-| Letter | fixed table | A+ 98 · A 95 · A− 92 · B+ 88 · B 85 · B− 82 · C+ 78 |
-| Verdict badge | per-outlet mapping | Eurogamer *Essential* → 95 |
+| Letter | 95/85/75/65 for A/B/C/D, ±3 for the suffix; F is 50 | B+ → 88 |
+| Verdict badge | per-outlet `verdicts` map | Eurogamer *Essential* → 95 |
 
-Open decisions: the minimum source count before a score publishes; whether
-outlets are ever weighted; how a revised review is handled.
+Anything unparseable throws `NormalizeError` rather than guessing, so a typo
+fails the build instead of quietly moving a score.
 
-### Where it needs to come from
+> The design canvas prints Digital Foundry's `A` as 93. The table above is
+> normative and makes it 95; the artboard predates the table. Nothing else in
+> `.design/Main.dc.html` disagrees with the model.
 
-- **Metadata and images** — IGDB (free, via a Twitch dev account) and RAWG.
-  Neither account exists yet. Verify commercial terms before launch; free tiers
+### What is seeded — `src/data/scores.ts`
+
+Three games only: Ashen Trials (51 rows), Hollow Vector (38), Driftbound (44).
+The other 17 games in `games.ts` carry no rows and therefore publish no score
+and print no source count, which is the honest outcome — see §5 rule 4.
+
+Every `reviewUrl` uses the reserved `.invalid` TLD (RFC 2606) and can never
+resolve, so no placeholder row can be mistaken for a citation.
+
+### Still missing
+
+- **Real scores.** Semi-automated curation of the top 20–30 games of 2026,
+  ~10–15 outlets each. Manual work; roughly 450 rows. Small enough to stay
+  generated JSON in the repo — it does not need a database.
+- **Game metadata and art** — IGDB (free, via a Twitch dev account) and RAWG.
+  Neither account exists. Verify commercial terms before launch; the free tiers
   are aimed at non-commercial use.
-- **Per-outlet scores** — semi-automated curation of the top 20–30 games of
-  2026, ~10–15 outlets each, roughly 450 rows. That is small enough to live as
-  generated JSON in the repo; it does not need a database. See the stack notes
-  in the master doc.
-
----
+- **The "How we score" page**, which the model above is written to be published
+  on.
 
 ## 5. Consistency rules to preserve
 
@@ -215,3 +234,7 @@ Whatever the score model becomes, these must hold:
    evidence.
 4. **`sourceCount` must equal the number of rows**, or it is a false claim on
    the most important number on the page.
+
+All four now hold in code: 1 and 2 by construction inside `aggregate()`, 3 by
+`scoreRowSchema` requiring a URL, 4 by `sourceCountFor()` being the only way a
+count reaches a page. `score.test.ts` pins 2 and 4 against the design's figures.
