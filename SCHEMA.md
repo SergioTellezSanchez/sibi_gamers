@@ -13,7 +13,7 @@ as placeholder data · `PROPOSED` does not exist in code.
 | Layer | Lives in | Source of truth | Status |
 | --- | --- | --- | --- |
 | Editorial — reviews, news, guides | `src/content/**/*.md` | Markdown, written by people | LIVE |
-| Homepage game seed | `src/data/games.ts` | hand-written TypeScript | SEED |
+| Game catalogue | `src/data/games.ts` | hand-written, 20 games | SEED |
 | Outlet table | `src/data/outlets.ts` | hand-written, 53 outlets | SEED |
 | Per-outlet scores | `src/data/scores.ts` | hand-written, 3 games, 133 rows | SEED |
 | Aggregates (mean, median, histogram) | `src/lib/score/` | derived, never stored | LIVE |
@@ -101,46 +101,52 @@ list is not linked — wire anchors when real sectioned copy lands.
 
 ---
 
-## 3. Homepage game data — SEED
+## 3. Game catalogue — SEED
 
-`src/data/games.ts` (258 lines) is the seed dataset lifted from the design.
-Everything reaches components through `getYearData(year)`, so replacing it with
-a real fetch means rewriting that one function.
+`src/data/games.ts` holds one record per game, and everything else derives
+from it: the ranking, the podium, the game pages, the recommender bank, the
+source counts. When IGDB/RAWG arrive they replace `GAMES` and nothing
+downstream changes shape.
 
 ```ts
-Game            { rank, title, date, platforms[], score, studio, country,
-                  director, budget, genre, length, sourceCount? }
-TopGame         { rank, title, platforms[], genres[], score, sourceCount? }
-NewsItem        { source, headline, date }
-ReviewItem      { title, excerpt, score }
-Recommendation  { title, reason, score }
-YearData        { topGames: TopGame[], rankedGames: Game[] }
+CatalogGame     { id, title, released, platforms[], genre, score, studio,
+                  country, director, budget, length, blurb }
 
-getYearData(year): YearData
+GAMES: CatalogGame[]                       // 20 entries, all 2026
+getGame(id) · findGameByTitle(title)       // reviews are keyed by title
+scoreFor(id): { rows, aggregate }          // the game page's data
+sourceCountFor(id): number | undefined     // the only source of a count
+relatedGames(game, n = 4)                  // same genre, then nearest score
+```
+
+`id` is the route slug (`/games/<id>/`) and the key `scores.ts` rows cite.
+`score` is hand-picked; where rows exist it **must equal** the computed mean
+(pinned by `score.test.ts`), so the homepage and the game page print the same
+number.
+
+The homepage reads through `getYearData(year)`, which projects the catalogue
+onto the shapes the islands render:
+
+```ts
+Game            { id, rank, title, date, platforms[], score, studio, country,
+                  director, budget, genre, length, sourceCount? }
+TopGame         { id, rank, title, platforms[], genres[], score, sourceCount? }
+Recommendation  { id, title, reason, score }
+YearData        { topGames: TopGame[], rankedGames: Game[] }
 ```
 
 Also exported: `CURRENT_YEAR` (2026), `GRADIENTS` (cover fills from the ember
 ramp), `DECADES`, `STOREFRONTS`, `REC_BANK` (the static recommender responses
 standing in for `/api/recommend`).
 
-`sourceCount` is optional and never authored. `sourceCountFor(title)` derives
-it from `src/data/scores.ts`, so only the three seeded games carry one; the
-other 17 render without the caption.
+`sourceCount` is optional and never authored. `sourceCountFor(id)` derives it
+from `src/data/scores.ts`, so only the three seeded games carry one; the other
+17 render without the caption.
 
 Years other than 2026 are **generated**: the seed is reshuffled with a
 year-seeded PRNG and scores are nudged, so the picker produces a distinct but
 reproducible ranking. None of it is real data, and none of those rows carries a
 source count — there is nothing to count.
-
-`NewsItem` and `ReviewItem` here duplicate what the `news` and `reviews`
-collections already hold. They feed the homepage digest columns and should be
-replaced by `getCollection()` calls.
-
-### Dead modules
-
-`src/data/reviews.ts`, `src/data/news.ts` and `src/data/guides.ts` — **518 lines,
-zero importers.** Superseded when editorial content moved to Markdown
-collections. Safe to delete.
 
 ---
 
@@ -185,8 +191,9 @@ stored.
 
 ### Normalization rules
 
-Publish these on a "How we score" page; the claim against Metacritic is that
-the arithmetic is public.
+Published at `/how-we-score/`, which renders `LETTER_SCORES`, `MIN_SOURCES`
+and every outlet's `verdicts` map straight from the code, so the page cannot
+drift from the arithmetic.
 
 | Native scale | Rule | Example |
 | --- | --- | --- |
@@ -220,8 +227,6 @@ resolve, so no placeholder row can be mistaken for a citation.
 - **Game metadata and art** — IGDB (free, via a Twitch dev account) and RAWG.
   Neither account exists. Verify commercial terms before launch; the free tiers
   are aimed at non-commercial use.
-- **The "How we score" page**, which the model above is written to be published
-  on.
 
 ## 5. Consistency rules to preserve
 

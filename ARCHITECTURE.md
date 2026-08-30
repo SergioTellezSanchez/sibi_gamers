@@ -42,9 +42,11 @@ a server yet.
 | `/reviews/[slug]/` | `content/reviews/*.md` | 13 |
 | `/news/[slug]/` | `content/news/*.md` | 11 |
 | `/guides/[slug]/` | `content/guides/*.md` | 10 |
+| `/games/[slug]/` | `data/games.ts` catalogue | 20 |
+| `/how-we-score/` | `pages/how-we-score.astro` | 1 |
 
-**38 pages total.** Detail routes use `getStaticPaths()` over the collection and
-`render(entry)` for the body. Each carries prev/next within its own section,
+**59 pages total.** Editorial detail routes use `getStaticPaths()` over the
+collection and `render(entry)` for the body. Each carries prev/next within its own section,
 ordered by date for reviews and news and by the `order` field for guides.
 
 `Base.astro` owns `<head>`: title, description, canonical, Open Graph. Detail
@@ -238,10 +240,6 @@ Break these and the model breaks with them:
 
 ## 13. Known gaps
 
-- **No game detail page.** The design is chosen (direction A) and the score
-  model it was blocked on now exists, so this is the next thing to build. Every
-  game link in the islands still points at `#`, and those links are also the
-  only remaining sub-44px touch targets.
 - **No real score data.** The score model is built and tested
   (`src/lib/score/`), but the rows feeding it are invented: 133 placeholder
   scores across three games, attributed to real outlets for games that do not
@@ -249,7 +247,13 @@ Break these and the model breaks with them:
   SCHEMA.md §4.
 - **All copy is placeholder.** Every verdict, headline, critic and studio name is
   invented and must be replaced before launch.
-- **Three dead data modules.** `src/data/reviews.ts`, `news.ts` and `guides.ts`
-  (518 lines) have zero importers since content moved to Markdown.
-- **Footer links go nowhere.** About, Contact, Press, Terms, Privacy and "How we
-  score" all resolve to `/`. Social icons are `#`.
+- **Placeholder art everywhere.** The game page's key art, gallery and "More
+  like this" covers are gradient fills. The "Download all in high quality"
+  button, here and in the homepage band, does nothing until there are assets.
+- **No store links.** The "Play on" rail lists storefronts as tags; affiliate
+  links and prices are a Phase 3 item.
+- **Search is a 404.** The nav form posts to `/search`, which has no route.
+- **Footer links go nowhere.** About, Contact, Press, Terms and Privacy resolve
+  to `/`. Social icons are `#`. "How we score" now resolves.
+- **Homepage "View all" and "Full rankings" are `#`.** There is no full
+  rankings page; the homepage shows the top 20 and that is the whole catalogue.

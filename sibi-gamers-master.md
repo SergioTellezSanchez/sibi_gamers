@@ -66,7 +66,7 @@ Portal de videojuegos con tres pilares de contenido y un diferenciador central:
 ### Fase 2 — Diseño (Claude Design)
 - [x] **Design system** (logo de flama geométrica estilo bordado mazahua, tokens, tipografía, componentes, motion GSAP) — completado
 - [x] Homepage — completada (top 3 + tabla 4-20 con metadata rica, recomendador, noticias, reviews, banda de descargas)
-- [ ] **Página de detalle de juego (siguiente): prompt en sección 8c** — va por el flujo Design→Code, NO se diseña en código
+- [x] **Página de detalle de juego** — canvas en `.design/`, dirección A (Broadsheet) elegida, implementada en código
 - [x] ~~Plantilla de artículo (noticia/reseña/guía)~~ — **resuelto en código**, no pasa
       por Claude Design (ver registro de decisiones, Ago 2026)
 - [ ] Módulo del recomendador IA
@@ -89,9 +89,16 @@ Portal de videojuegos con tres pilares de contenido y un diferenciador central:
       0-100 y agregados (media, mediana, histograma) derivados de las filas, nunca
       almacenados. 16 tests con `pnpm test`. Falta la curación de datos reales
 - [ ] Endpoint `/api/recommend` con la API de Claude (reservado, requiere adapter)
-- [ ] Página de detalle de juego (cuando llegue el diseño de Fase 2)
+- [x] **Página de detalle de juego** (`/games/[slug]/`, 20 páginas) según la dirección A:
+      key art, tira de score, desglose por fuente con histograma, rail con tienda /
+      reseña / guías / noticias, galería, ficha y "más como este". JSON-LD
+      `VideoGame` con `aggregateRating` solo cuando hay score publicado
+- [x] **Página "How we score"** (`/how-we-score/`) que renderiza las mismas tablas que
+      usa el código, para que no diverjan
+- [x] **Catálogo único de juegos** (`GAMES` en `games.ts`): ranking, podio, páginas de
+      juego, recomendador y conteo de fuentes derivan de él
 - [ ] Base de datos de juegos alimentada por APIs (RAWG, IGDB) para metadata e imágenes
-- [ ] Sistema de score agregado
+- [ ] Curación de scores reales (20-30 juegos, 10-15 outlets cada uno)
 - [ ] Pipeline de contenido automatizado con Claude (noticias/borradores)
 
 ### Fase 4 — Contenido inicial
@@ -414,12 +421,13 @@ src/
 - `site` apunta a `sibigamers.gg`, dominio que aún no está conectado al deploy: todos
   los canonical y OG del sitio en vivo señalan a una URL que no resuelve. Aplazado a
   propósito; hay que resolverlo antes de pedir indexación.
-- Los enlaces dentro de las islas (RankingsBoard, PromptBox) siguen por debajo de 44px
-  en táctil: apuntan a `#`, así que se les aplicará el mismo patrón de enlace extendido
-  cuando exista la ruta de detalle de juego.
-- Los enlaces a **página de juego** siguen en `#` (RankingsBoard y PromptBox): esa
-  ruta no existe hasta que vuelva el diseño de Fase 2. Los enlaces editoriales ya
-  resuelven. Los iconos sociales del footer también siguen en `#` (Fase 1).
+- Todo el arte es placeholder: key art, galería y portadas son degradados. El botón
+  "Download all in high quality" no hace nada hasta que existan assets.
+- "Play on" lista tiendas como etiquetas; sin enlaces de afiliado ni precios todavía.
+- El buscador de la barra envía a `/search`, ruta que no existe (404).
+- "View all" / "Full rankings" en la home siguen en `#`: no hay página de ranking
+  completo porque el catálogo entero ya es el top 20. Los iconos sociales del footer
+  también siguen en `#` (Fase 1).
 - Todo el copy (verdicts, headlines, guías, nombres de críticos) es placeholder
   inventado. Hay que reemplazarlo antes de cualquier lanzamiento.
 
@@ -445,5 +453,8 @@ src/
 | Ago 2026 | **Plantilla de artículo en código, no en Claude Design.** Fase 2 la listaba como entregable de diseño, pero se resolvió por el precedente de los índices: lo editorial se construye code-first sobre el design system y solo la página de juego pasa por Design→Code. Desbloquea 34 artículos que ya existían en Markdown pero no tenían ruta |
 | Ago 2026 | **Score mínimo de 5 fuentes para publicar**, igual que OpenCritic, y **sin ponderación por outlet** en el MVP (`weight` existe pero se ignora, para no migrar datos después). Una reseña revisada reemplaza a la original: una fila por outlet, gana la más reciente |
 | Ago 2026 | **`sourceCount` deja de escribirse a mano.** Sale de `sourceCountFor()`, que cuenta filas reales, o no se renderiza. Los 17 juegos sin filas dejaron de mostrar un número inventado, y el campo salió del frontmatter de las reseñas: la reseña es un crítico, el agregado es del juego |
+| Ago 2026 | **Un solo catálogo de juegos.** La identidad de un juego estaba repartida entre dos arrays en `games.ts`, el frontmatter de las reseñas y `scores.ts`, unidos por slug del título. Ahora `GAMES` es la única fuente y el `id` explícito es la clave de ruta y de score. Las reseñas siguen indexadas por título porque las escriben personas |
+| Ago 2026 | **El key art de la página de juego llena el contenedor, no el viewport.** Un full-bleed real (`margin: calc(50% - 50vw)`) desborda por el ancho de la barra de scroll en todo SO que la dibuje, y el sitio garantiza cero desbordamiento horizontal |
+| Ago 2026 | **"Mostrar las 51 fuentes" es un `<details>` nativo.** Todas las filas van en el HTML y nada hidrata: cumple los invariantes 1 y 2 sin excepción para la página de ingresos |
 | Ago 2026 | **Gestor de paquetes: pnpm** (`packageManager` fijado, `pnpm-workspace.yaml` con `allowBuilds: esbuild`). Se descartó npm; el lockfile se regeneró desde cero |
 | Ago 2026 | GSAP se carga en idle y no se carga con reduced-motion: el motion es aditivo, nunca requisito para leer |

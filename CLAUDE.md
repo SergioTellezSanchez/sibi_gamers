@@ -20,7 +20,7 @@ English, matching the site itself.
 ```bash
 pnpm install
 pnpm dev       # http://localhost:4321 — Astro 7 daemonizes; see below
-pnpm build     # astro check && astro build → dist/  (38 pages)
+pnpm build     # astro check && astro build → dist/  (59 pages)
 pnpm test      # vitest — the score model in src/lib/score/
 pnpm lint      # oxlint
 ```
@@ -65,7 +65,7 @@ src/
   islands/          the only two React components that hydrate
   scripts/          motion.ts (GSAP, data-attribute driven) · filters.ts
   lib/score/        normalization + aggregation; the only place a score is computed
-  data/games.ts     homepage seed data (games.ts is live; the other three are dead)
+  data/games.ts     the catalogue — 20 games; everything else derives from it
   data/outlets.ts   53 outlets and their scales
   data/scores.ts    133 placeholder per-outlet rows, 3 games
 ```
@@ -85,22 +85,18 @@ Do not treat any of this as real:
 
 ## Current state
 
-Built: homepage, three section indices, 34 article detail pages, the motion and
-filter systems, and a cross-device pass verified from 320px to 2560px.
+Built: homepage, three section indices, 34 article pages, 20 game pages
+(direction A from the design canvas), the "How we score" page, the score model
+(`src/lib/score/`, 20 tests), the motion and filter systems, and a
+cross-device pass from 320px to 2560px.
 
-Built since: the score model — `src/lib/score/` normalizes any outlet scale to
-0-100 and derives mean, median and histogram from the rows, with 16 tests
-pinning it to the chosen design's figures. Three games are seeded.
-
-Not built: the game detail page (design chosen — direction A, and no longer
-blocked), real score data, the "How we score" page, `/api/recommend`.
+Not built: real score data (three games are seeded, the rest publish no
+score), IGDB/RAWG metadata and art, `/api/recommend`, search (the nav form
+posts to `/search`, which does not exist), the footer's About/Contact/Press/
+Terms/Privacy pages.
 
 Deployed to https://sibi-gamers.vercel.app. The canonical URLs still say
 `sibigamers.gg`, a domain that is not attached yet — a known, deliberate gap.
-
-Game links in the islands still point at `#` and are the only remaining
-sub-44px touch targets; they need the stretched-link treatment when the route
-exists.
 
 ## Conventions
 
