@@ -67,7 +67,8 @@ Portal de videojuegos con tres pilares de contenido y un diferenciador central:
 - [x] **Design system** (logo de flama geométrica estilo bordado mazahua, tokens, tipografía, componentes, motion GSAP) — completado
 - [x] Homepage — completada (top 3 + tabla 4-20 con metadata rica, recomendador, noticias, reviews, banda de descargas)
 - [ ] **Página de detalle de juego (siguiente): prompt en sección 8c** — va por el flujo Design→Code, NO se diseña en código
-- [ ] Plantilla de artículo (noticia/reseña/guía)
+- [x] ~~Plantilla de artículo (noticia/reseña/guía)~~ — **resuelto en código**, no pasa
+      por Claude Design (ver registro de decisiones, Ago 2026)
 - [ ] Módulo del recomendador IA
 
 ### Fase 3 — Desarrollo (Claude Code)
@@ -76,7 +77,14 @@ Portal de videojuegos con tres pilares de contenido y un diferenciador central:
 - [x] Índices de Reviews / News / Guides — **construidos code-first**, no pasaron por Claude Design. Consumen estrictamente los tokens y componentes de `src/ds/`. Se pueden empujar a Claude Design vía `/design-sync` para pulido visual si hace falta.
 - [x] Contenido editorial en Markdown (content collections de Astro)
 - [x] Sistema de motion completo según §8b (count-up al entrar en viewport, barra que se expande en hover, flicker del logomark)
-- [ ] Adapter de deploy (Vercel/Netlify) para habilitar rutas SSR
+- [x] **Páginas de detalle de artículo** para reviews, noticias y guías (`[slug].astro`),
+      con migas, prev/next, JSON-LD por tipo y `og:type=article`. El sitio pasó de 4 a
+      38 páginas rastreables; los 34 artículos en Markdown ya son alcanzables
+- [x] **Pase cross-device**: sin desbordamiento horizontal de 320px a 2560px (83 de 84
+      combinaciones página×ancho limpias, la restante es 1px de redondeo), paso de 2
+      columnas para tablet en el top 3, objetivos táctiles de 44px vía `pointer: coarse`,
+      y el contenedor crece a 1440/1560px por encima de 1600/2100px
+- [x] **Adapter de deploy** (`@astrojs/vercel`) — desplegado en https://sibi-gamers.vercel.app; ninguna ruta usa SSR todavía
 - [ ] Endpoint `/api/recommend` con la API de Claude (reservado, requiere adapter)
 - [ ] Página de detalle de juego (cuando llegue el diseño de Fase 2)
 - [ ] Base de datos de juegos alimentada por APIs (RAWG, IGDB) para metadata e imágenes
@@ -321,6 +329,9 @@ Use invented placeholder data consistent with the homepage (e.g., Ashen Trials,
 
 ## 8d. Plan de datos (sistema de score)
 
+> El modelo propuesto (`Game` / `Outlet` / `Score`, reglas de normalización y
+> qué falta) está desarrollado en [SCHEMA.md](SCHEMA.md) §4.
+
 - **Metadata e imágenes:** IGDB API (vía cuenta dev de Twitch, gratis) + RAWG API. Alimentan nombres, portadas, screenshots, géneros, plataformas, estudios — y el feature de imágenes HQ.
 - **Scores por fuente (MVP):** curación semiautomatizada de los 20-30 juegos top de 2026. Por juego: score de 10-15 outlets (IGN, GameSpot, PC Gamer, Eurogamer, Polygon…) + URL de la reseña original. Sin scraping masivo que viole ToS; los scores son datos factuales y siempre se enlaza a la fuente (modelo AOTY/OpenCritic). Respaldo: `aggregated_rating` de IGDB.
 - **Normalización:** 9/10 → 90 · 4/5 → 80 · letter grades (B+ → 78, etc.) · definir mínimo de fuentes para publicar score.
@@ -328,6 +339,9 @@ Use invented placeholder data consistent with the homepage (e.g., Ashen Trials,
 - **Pendiente:** crear cuentas en dev.twitch.tv (IGDB) y rawg.io/apidocs; definir modelo de datos (games, sources, reviews) antes de Claude Code.
 
 ## 11. Arquitectura técnica (estado actual del repo)
+
+> Resumen. El detalle técnico vive en [ARCHITECTURE.md](ARCHITECTURE.md) y los
+> esquemas de datos en [SCHEMA.md](SCHEMA.md); ahí se actualizan, no aquí.
 
 **Stack: Astro 7 + islas React 19 + GSAP 3 + TypeScript.**
 
@@ -338,18 +352,25 @@ un LCP lento — justo lo contrario de lo que el modelo necesita. Astro entrega 
 completo por ruta, con su propio title, description y canonical, y solo hidrata las
 piezas que de verdad tienen estado.
 
-Medido en el build actual: **1.7 kB gz de JS por página** frente a los 129 kB gz del
-SPA que se descartó.
+Medido en el build actual: **1.6–1.7 kB gz de JS** en las 37 páginas editoriales
+(artículos e índices) frente a los 129 kB gz del SPA que se descartó. **La home es
+la excepción: ~64 kB gz**, porque hidrata `RankingsBoard` con `client:load` y eso
+pone el runtime de React en la ruta crítica. Sigue ganando al SPA, pero no es la
+cifra de las otras 37. Detalle y palanca de mejora en [ARCHITECTURE.md](ARCHITECTURE.md) §4.
 
 ```
 src/
   pages/            una ruta por archivo → HTML estático
+    reviews/[slug]  · news/[slug] · guides/[slug] — detalle de artículo,
+                    getStaticPaths sobre la colección; prev/next y JSON-LD
   layouts/Base      shell + <head> por página (title, description, canonical, OG)
   content/          reviews · news · guides en Markdown (content collections)
   content.config.ts esquemas Zod que validan el frontmatter en cada build
   ds/               design system portado del bundle de Claude Design
     tokens/         colors · typography · spacing · fonts — copiados literales
   components/       componentes .astro (cero JS en cliente)
+    ArticleShell    migas + medida de lectura + prev/next, compartido por
+                    las tres secciones; la cabecera llega por slot
   islands/          los ÚNICOS componentes React que se hidratan:
                       RankingsBoard  selector década/año + ranking
                       PromptBox      recomendador
@@ -379,9 +400,17 @@ src/
    APIs (§8d), así que no se disfrazan de Markdown.
 
 **Deuda conocida:**
-- Falta el adapter de deploy; sin él no hay rutas SSR y el recomendador sigue con un
-  banco de recomendaciones estático.
-- Todos los enlaces de tarjeta apuntan a `#`: no existen rutas de detalle todavía.
+- El adapter ya está, pero ninguna ruta ha optado por SSR: el recomendador sigue
+  sirviendo desde un banco estático hasta que exista `/api/recommend`.
+- `site` apunta a `sibigamers.gg`, dominio que aún no está conectado al deploy: todos
+  los canonical y OG del sitio en vivo señalan a una URL que no resuelve. Aplazado a
+  propósito; hay que resolverlo antes de pedir indexación.
+- Los enlaces dentro de las islas (RankingsBoard, PromptBox) siguen por debajo de 44px
+  en táctil: apuntan a `#`, así que se les aplicará el mismo patrón de enlace extendido
+  cuando exista la ruta de detalle de juego.
+- Los enlaces a **página de juego** siguen en `#` (RankingsBoard y PromptBox): esa
+  ruta no existe hasta que vuelva el diseño de Fase 2. Los enlaces editoriales ya
+  resuelven. Los iconos sociales del footer también siguen en `#` (Fase 1).
 - Todo el copy (verdicts, headlines, guías, nombres de críticos) es placeholder
   inventado. Hay que reemplazarlo antes de cualquier lanzamiento.
 
@@ -404,4 +433,6 @@ src/
 | Ago 2026 | **Stack: Astro + islas React + GSAP.** Razón: el negocio es SEO-first (§5), y un SPA cliente no entrega HTML rastreable ni meta por ruta. Se descartó un primer prototipo en Vite + React Router (129 kB gz de JS) y se portó antes de añadir páginas nuevas, mientras el costo de migración era bajo |
 | Ago 2026 | Contenido editorial (reviews, noticias, guías) en Markdown vía content collections con esquemas Zod. Los datos de juegos siguen en TypeScript porque vendrán de IGDB/RAWG |
 | Ago 2026 | Reviews / News / Guides se construyen **code-first** sobre el design system, sin esperar re-derivación en Claude Design. La página de detalle de juego SÍ pasa por Design→Code por ser la página de ingresos |
+| Ago 2026 | **Plantilla de artículo en código, no en Claude Design.** Fase 2 la listaba como entregable de diseño, pero se resolvió por el precedente de los índices: lo editorial se construye code-first sobre el design system y solo la página de juego pasa por Design→Code. Desbloquea 34 artículos que ya existían en Markdown pero no tenían ruta |
+| Ago 2026 | **Gestor de paquetes: pnpm** (`packageManager` fijado, `pnpm-workspace.yaml` con `allowBuilds: esbuild`). Se descartó npm; el lockfile se regeneró desde cero |
 | Ago 2026 | GSAP se carga en idle y no se carga con reduced-motion: el motion es aditivo, nunca requisito para leer |

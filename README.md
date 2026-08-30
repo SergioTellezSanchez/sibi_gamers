@@ -1,18 +1,27 @@
 # Sibi Gamers
 
 Critic-aggregated game rankings, reviews, news and guides.
-Project direction, roadmap and decision log live in
-[sibi-gamers-master.md](sibi-gamers-master.md) — that document is the source of truth;
-this one only covers running the code.
+
+| Document | For |
+| --- | --- |
+| [sibi-gamers-master.md](sibi-gamers-master.md) | Source of truth — brand, roadmap, decision log |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | How the code works and the invariants behind it |
+| [SCHEMA.md](SCHEMA.md) | Data shapes; what is real vs proposed |
+| [CLAUDE.md](CLAUDE.md) | Orientation for AI coding sessions |
+
+This file only covers running the code.
 
 **Stack:** Astro 7 · React 19 (islands only) · TypeScript · GSAP 3
 
+This project uses **pnpm** (see `packageManager` in `package.json`).
+If you don't have it: `corepack enable` or `npm i -g pnpm`.
+
 ```bash
-npm install
-npm run dev       # http://localhost:4321
-npm run build     # astro check && astro build
-npm run preview   # serve the production build
-npm run lint      # oxlint
+pnpm install
+pnpm dev       # http://localhost:4321
+pnpm build     # astro check && astro build
+pnpm preview   # serve the production build
+pnpm lint      # oxlint
 ```
 
 ## Routes
