@@ -69,7 +69,7 @@ Portal de videojuegos con tres pilares de contenido y un diferenciador central:
 - [x] **Página de detalle de juego** — canvas en `.design/`, dirección A (Broadsheet) elegida, implementada en código
 - [x] ~~Plantilla de artículo (noticia/reseña/guía)~~ — **resuelto en código**, no pasa
       por Claude Design (ver registro de decisiones, Ago 2026)
-- [ ] Módulo del recomendador IA
+- [x] ~~Módulo del recomendador IA~~ — resuelto dentro del diseño de la home (`PromptBox`); el endpoint es de Fase 3
 
 ### Fase 3 — Desarrollo (Claude Code)
 - [x] **Stack decidido: Astro + islas React + GSAP** (ver §11 y registro de decisiones)
@@ -378,6 +378,10 @@ src/
   pages/            una ruta por archivo → HTML estático
     reviews/[slug]  · news/[slug] · guides/[slug] — detalle de artículo,
                     getStaticPaths sobre la colección; prev/next y JSON-LD
+    games/[slug]    página de juego (dirección A); desglose por fuente,
+                    histograma, JSON-LD VideoGame con aggregateRating
+    how-we-score    las reglas de normalización, renderizadas desde el código
+    api/recommend   la ÚNICA ruta SSR: Claude elige 5 juegos del catálogo
   layouts/Base      shell + <head> por página (title, description, canonical, OG)
   content/          reviews · news · guides en Markdown (content collections)
   content.config.ts esquemas Zod que validan el frontmatter en cada build
@@ -392,7 +396,10 @@ src/
   scripts/
     motion.ts       GSAP para todo el sitio, vía data-attributes
     filters.ts      filtros de Reviews/News/Guides sin framework (428 B gz)
-  data/games.ts     datos estructurados de juegos (futuro: IGDB/RAWG)
+  lib/score/        normalización + agregados; lib/recommend.ts, la parte pura del endpoint
+  data/games.ts     el catálogo (20 juegos); todo lo demás deriva de él (futuro: IGDB/RAWG)
+  data/outlets.ts   53 outlets y sus escalas
+  data/scores.ts    133 filas placeholder de score por outlet, 3 juegos
 ```
 
 **Reglas que sostienen la arquitectura:**

@@ -21,7 +21,7 @@ English, matching the site itself.
 pnpm install
 pnpm dev       # http://localhost:4321 — Astro 7 daemonizes; see below
 pnpm build     # astro check && astro build → dist/  (59 pages)
-pnpm test      # vitest — the score model in src/lib/score/
+pnpm test      # vitest — src/lib/score/ and src/lib/recommend.ts
 pnpm lint      # oxlint
 ```
 
@@ -88,12 +88,10 @@ Do not treat any of this as real:
 
 Built: homepage, three section indices, 34 article pages, 20 game pages
 (direction A from the design canvas), the "How we score" page, the score model
-(`src/lib/score/`, 20 tests), the motion and filter systems, and a
-cross-device pass from 320px to 2560px.
-
-Built: `/api/recommend`, the one SSR route — Claude picks five games from
-the catalogue with structured output; without `ANTHROPIC_API_KEY` it answers
-from the static bank and says so.
+(`src/lib/score/`), `/api/recommend` (the one SSR route — Claude picks five
+catalogue games under structured output; without `ANTHROPIC_API_KEY` it
+answers from the static bank and says so), the motion and filter systems, and
+a cross-device pass from 320px to 2560px. 25 tests.
 
 Not built: real score data (three games are seeded, the rest publish no
 score), IGDB/RAWG metadata and art, search (the nav form posts to `/search`,
@@ -103,6 +101,19 @@ bank.
 
 Deployed to https://sibi-gamers.vercel.app. The canonical URLs still say
 `sibigamers.gg`, a domain that is not attached yet — a known, deliberate gap.
+
+## Next session
+
+In order. The first two need the owner; the rest do not.
+
+1. `ANTHROPIC_API_KEY` on Vercel, then a per-visitor rate limit on
+   `/api/recommend` before the feature is announced.
+2. Decide which real games of 2026 the site ranks, and get IGDB (Twitch dev)
+   and RAWG credentials. Everything in `data/` is fictional until then.
+3. Real score curation into `scores.ts`, one game at a time; each game's
+   `score` in the catalogue must equal its computed mean (a test enforces it).
+4. Search: either a route for the nav form or remove the form.
+5. The `sibigamers.gg` canonical, last.
 
 ## Conventions
 

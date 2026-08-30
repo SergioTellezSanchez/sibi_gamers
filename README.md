@@ -19,7 +19,8 @@ If you don't have it: `corepack enable` or `npm i -g pnpm`.
 ```bash
 pnpm install
 pnpm dev       # http://localhost:4321
-pnpm build     # astro check && astro build
+pnpm build     # astro check && astro build → 59 pages + one function
+pnpm test      # vitest — score model and recommender logic
 pnpm preview   # serve the production build
 pnpm lint      # oxlint
 ```
@@ -32,6 +33,10 @@ pnpm lint      # oxlint
 | `/reviews/` | `content/reviews/*.md` | score-band filter (no framework) |
 | `/news/` | `content/news/*.md` | category filter (no framework) |
 | `/guides/` | `content/guides/*.md` | type filter (no framework) |
+| `/reviews/[slug]/` · `/news/[slug]/` · `/guides/[slug]/` | the same Markdown | none |
+| `/games/[slug]/` | `data/games.ts` catalogue | none — "show all sources" is a `<details>` |
+| `/how-we-score/` | `pages/how-we-score.astro` | none |
+| `POST /api/recommend` | `pages/api/recommend.ts` | the one server route (Vercel function) |
 
 ## Layout
 
@@ -45,10 +50,14 @@ src/
     tokens/         colors · typography · spacing · fonts (copied verbatim)
   components/       .astro components — zero client JS
   islands/          the only React that hydrates
+  pages/api/        recommend.ts — Claude API, SSR; lib/recommend.ts is its pure half
+  lib/score/        normalization + aggregation, unit-tested
   scripts/
     motion.ts       all site motion, via data-attributes
     filters.ts      list filtering, 428 B gz
-  data/games.ts     structured game data (IGDB/RAWG later)
+  data/games.ts     the catalogue; everything derives from it (IGDB/RAWG later)
+  data/outlets.ts   outlets and their scales
+  data/scores.ts    per-outlet score rows (placeholder)
   styles/app.css    page styles + the design's token overrides
 ```
 
@@ -84,11 +93,13 @@ feature at the top of its section.
 
 ## Known gaps
 
-- **No deploy adapter yet.** Static output only. Adding Vercel/Netlify unlocks
-  `export const prerender = false`, which is the path for the `/api/recommend` endpoint
-  backed by the Claude API. Until then the recommender returns a fixed bank.
-- **Card links point to `#`.** Detail routes don't exist yet; the game detail page is
-  next and goes through Claude Design first (master doc §8c).
+- **Deployed at https://sibi-gamers.vercel.app**, but canonical URLs still say
+  `sibigamers.gg`, which is not attached. Settle before asking for indexing.
+- **The recommender is on the static bank in production** until `ANTHROPIC_API_KEY`
+  is set on the Vercel project (`vercel env add ANTHROPIC_API_KEY production`). The
+  island labels bank answers. No per-visitor rate limit yet.
+- **Score data is invented.** The arithmetic is real and tested; the 133 rows behind
+  three games are placeholders. The other 17 games publish no score.
 - **All copy is placeholder.** Verdicts, headlines, guide text and every critic byline
   are invented, sized to exercise the layouts. Replace before launch.
 - **Fonts are substitutes.** Big Shoulders and IBM Plex Sans stand in via Google Fonts;
