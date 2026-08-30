@@ -1,0 +1,17 @@
+{
+  "pages": [
+    { "id": "page-1", "name": "Game page" },
+    { "id": "page-2", "name": "Directions not taken" }
+  ],
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1440, "h": 3900, "title": "A — Broadsheet", "page": "page-1" },
+    { "file": "SplitEmber.dc.html", "x": 0, "y": 0, "w": 1440, "h": 3150, "title": "B — Split Ember", "page": "page-2" },
+    { "file": "ScoreSheet.dc.html", "x": 1560, "y": 0, "w": 1440, "h": 3250, "title": "C — Score Sheet", "page": "page-2" }
+  ],
+  "annotations": [
+    { "id": "dir-a", "x": 0, "y": -300, "w": 620, "page": "page-1", "text": "A — BROADSHEET · CHOSEN\nCinematic key art full-bleed with the title at 132px; the score sits in a strip directly beneath it alongside studio, release, length and year rank. Below, the source breakdown becomes the main column with buying and related content in a sticky rail.\n\nMeasured at 1440 wide: 3805px tall, no horizontal overflow.\n\nStill placeholder: the cover and screenshots are drawn stand-ins for IGDB/RAWG art, and the outlet rows are invented. The 51 sources do bucket to 11/14/18/6/2, which averages to exactly 94, so the histogram and the headline number agree." },
+    { "id": "dir-b", "x": 0, "y": -300, "w": 620, "page": "page-2", "text": "B — SPLIT EMBER · not taken\nA sticky left panel carrying the portrait cover on the stacked ember plates, the score, the store buttons and the spec facts, beside a scrolling column.\n\nWorth keeping in mind: score and buy buttons stayed on screen the whole way down, which is the strongest arrangement for affiliate conversion. If A's rail turns out to convert badly, this is the fallback." },
+    { "id": "dir-c", "x": 1560, "y": -300, "w": 620, "page": "page-2", "text": "C — SCORE SHEET · not taken\nThe number as the image: 94 at 260px with the distribution built underneath it as a ridge, sources as a dense three-column monospace ledger, media running off the right edge.\n\nWorth keeping in mind: the ledger treatment is the sharpest expression of the transparency claim. It could return as the layout for the \"How we score\" page." }
+  ],
+  "launch": { "view": "canvas", "page": "page-1" }
+}
