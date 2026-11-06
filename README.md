@@ -80,7 +80,9 @@ whichever subset the default filter selects, and the pages work identically befo
 Scores render their final value in the HTML and reveals only fade content *in*, so if
 the script never runs the page is complete and correct — just still.
 
-Result: **1.7 kB gz of JS per page**, versus 129 kB gz for the Vite SPA this replaced.
+Result: **1.6 kB gz of JS on most pages** and 2.1 kB on the three section indices, versus
+129 kB gz for the Vite SPA this replaced. The homepage is the exception at ~95 kB gz; see
+[ARCHITECTURE.md](ARCHITECTURE.md) §4.
 
 ## Content
 
@@ -93,13 +95,19 @@ feature at the top of its section.
 
 ## Known gaps
 
+- **The work is not on `main`.** Everything past the initial commit is on
+  `SergioTellezSanchez/sibi-gamers-pnpm-migration`, with no PR.
 - **Deployed at https://sibi-gamers.vercel.app**, but canonical URLs still say
   `sibigamers.gg`, which is not attached. Settle before asking for indexing.
+- **No `sitemap.xml`, `robots.txt` or `og:image`.** Add them before asking for indexing.
+- **No CI.** Nothing runs `pnpm test` automatically.
 - **The recommender is on the static bank in production** until `ANTHROPIC_API_KEY`
-  is set on the Vercel project (`vercel env add ANTHROPIC_API_KEY production`). The
-  island labels bank answers. No per-visitor rate limit yet.
+  is set on the Vercel project (`vercel env add ANTHROPIC_API_KEY production`) and
+  production is redeployed. The island labels bank answers. No per-visitor rate limit
+  yet.
 - **Score data is invented.** The arithmetic is real and tested; the 133 rows behind
-  three games are placeholders. The other 17 games publish no score.
+  three games are placeholders. The other 17 games have no aggregate: they print a
+  hand-picked score with no source count.
 - **All copy is placeholder.** Verdicts, headlines, guide text and every critic byline
   are invented, sized to exercise the layouts. Replace before launch.
 - **Fonts are substitutes.** Big Shoulders and IBM Plex Sans stand in via Google Fonts;

@@ -136,12 +136,12 @@ YearData        { topGames: TopGame[], rankedGames: Game[] }
 ```
 
 Also exported: `CURRENT_YEAR` (2026), `GRADIENTS` (cover fills from the ember
-ramp), `DECADES`, `STOREFRONTS`, `REC_BANK` (the static recommender responses
-standing in for `/api/recommend`).
+ramp), `DECADES`, `STOREFRONTS`, `REC_BANK` (the static responses
+`/api/recommend` falls back to; see §4b).
 
 `sourceCount` is optional and never authored. `sourceCountFor(id)` derives it
 from `src/data/scores.ts`, so only the three seeded games carry one; the other
-17 render without the caption.
+17 render their hand-picked `score` without the caption.
 
 Years other than 2026 are **generated**: the seed is reshuffled with a
 year-seeded PRNG and scores are nudged, so the picker produces a distinct but
@@ -178,9 +178,12 @@ stored.
 ### Decisions taken
 
 - **Minimum 5 sources** (`MIN_SOURCES`) before a headline score publishes,
-  matching OpenCritic. Under it `published` is false and the caller must hide
-  the number; the breakdown table still renders, because the reviews are real
-  evidence even when the aggregate is not yet meaningful.
+  matching OpenCritic. Under it `published` is false: no source count, no
+  `aggregateRating`, no score in the meta description. The number itself stays
+  on the page: the game page falls back to the catalogue's hand-picked `score`
+  and labels it editorial, and the homepage prints it with no label. The
+  breakdown table still renders, because the reviews are real evidence even when
+  the aggregate is not yet meaningful.
 - **No weighting.** Every outlet counts once. `Outlet.weight` exists and is
   ignored, so weighting can arrive without a data migration.
 - **A revision replaces its original.** `aggregate()` keeps one row per outlet,
@@ -213,8 +216,9 @@ fails the build instead of quietly moving a score.
 ### What is seeded — `src/data/scores.ts`
 
 Three games only: Ashen Trials (51 rows), Hollow Vector (38), Driftbound (44).
-The other 17 games in `games.ts` carry no rows and therefore publish no score
-and print no source count, which is the honest outcome — see §5 rule 4.
+The other 17 games in `games.ts` carry no rows, so they have no aggregate and
+print no source count — see §5 rule 4. They still print and rank by their
+hand-picked `score`, as described under the minimum above.
 
 Every `reviewUrl` uses the reserved `.invalid` TLD (RFC 2606) and can never
 resolve, so no placeholder row can be mistaken for a citation.

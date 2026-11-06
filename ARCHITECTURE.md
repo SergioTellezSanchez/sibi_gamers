@@ -50,30 +50,38 @@ function, because it holds an API key that must never reach the browser.
 collection and `render(entry)` for the body. Each carries prev/next within its own section,
 ordered by date for reviews and news and by the `order` field for guides.
 
-`Base.astro` owns `<head>`: title, description, canonical, Open Graph. Detail
-pages pass `ogType="article"`; everything else defaults to `website`. Detail
-pages also emit JSON-LD — `Review` with `reviewRating`, `NewsArticle`, and
-`HowTo` with the guide's chapters as steps.
+`Base.astro` owns `<head>`: title, description, canonical, Open Graph. Article
+pages pass `ogType="article"`; everything else, game pages included, defaults to
+`website`. Article pages also emit JSON-LD — `Review` with `reviewRating`,
+`NewsArticle`, and `HowTo` with the guide's chapters as steps. Game pages emit
+`VideoGame`, with `aggregateRating` only when the score is published.
 
 ## 4. JavaScript budget
 
-Measured on the current build, gzipped, including transitive imports:
+Measured on the build of `cb1a397`, gzipped, including transitive imports.
+GSAP is excluded: it loads on idle (~44 kB gz) and never under reduced motion.
 
 | Page | JS | What it is |
 | --- | --- | --- |
-| Article pages (34) | **1.6 kB** | the motion module, nothing else |
-| Section indices (3) | **1.7 kB** | motion + the filter script |
-| Homepage | **~64 kB** | the above **plus React**, for two islands |
+| Articles, game pages, `/how-we-score/` (55) | **1.6 kB** | the motion module, nothing else |
+| Section indices (3) | **2.1 kB** | motion + the filter script |
+| Homepage | **~95 kB** | motion, React and the data the islands import |
 
 The homepage is the outlier and it is worth being precise about it: it hydrates
 `RankingsBoard` with `client:load` and `PromptBox` with `client:visible`. Both
 need the React runtime, and `client:load` puts most of it on the critical path.
-It still beats the 129 kB SPA that was discarded, but it is not the 1.7 kB the
-other 37 pages ship.
+It still beats the 129 kB SPA that was discarded, but it is not the 1.6 kB the
+other 58 pages mostly ship.
 
-If the homepage's LCP becomes a problem, the lever is `RankingsBoard`: the year
-picker is the only genuinely stateful part, and the ranking table underneath it
-could be server-rendered with the island reduced to the picker alone.
+About 30 kB of it is not React. Both islands import `data/games.ts`, which
+imports the score module, so the chunk named `jsx-runtime` carries Zod, the
+full catalogue with its blurbs and all 133 score rows.
+
+That is the first lever: keep Zod and the rows out of the client by passing the
+islands what they render, rather than letting them import `data/games.ts`. The
+second is `RankingsBoard` itself: the year picker is the only genuinely stateful
+part, and the ranking table underneath it could be server-rendered with the
+island reduced to the picker alone.
 
 ## 5. Islands policy
 
@@ -128,7 +136,9 @@ src/ds/
   tokens/colors.css       fire ramp: ink #03071E → amber flame #FFBA08
   tokens/typography.css   Big Shoulders (display) + IBM Plex Sans (body)
   tokens/spacing.css      4px scale, radii, shadows, motion timings
+  tokens/fonts.css        Google Fonts import, standing in for brand files
   scoreColor.ts           the 0-100 → band → colour mapping
+  ScoreDisplay.tsx, Tag.tsx   React twins of the .astro components, for islands
 ```
 
 `scoreColor.ts` is the brand's core logic: a score is always printed in its
@@ -142,7 +152,7 @@ One module, `scripts/motion.ts`, for the whole site. Static markup opts in:
 
 | Attribute | Effect |
 | --- | --- |
-| `data-reveal` / `data-reveal-item` | staggered section reveal |
+| `data-reveal` / `data-reveal-item` | staggered section reveal; `data-reveal-stagger` sets the gap |
 | `data-count="94"` | score counts up when scrolled into view |
 | `data-hover-lift` / `data-hover-bar` | card lift and underline expand |
 | `data-thumb-stack` | ranking row's ember plates slide out |
@@ -194,8 +204,10 @@ normal text selection inside a card.
 grows and the card grids gain a column. Reading measure is unaffected: article
 bodies are held at 72ch by `.article__body`.
 
-Verified across 84 page × width combinations from 320px to 2560px. Two failure
-modes caused every overflow found and are worth recognising on sight:
+Verified across 84 page × width combinations from 320px to 2560px. That pass
+predates the game pages and `/how-we-score/`, and there is no record of a
+re-run. Two failure modes caused every overflow found and are worth recognising
+on sight:
 
 - `grid-template-columns: 1fr` keeps an implicit *min-content* minimum, so a
   wide child stretches the track. Use `minmax(0, 1fr)`.
@@ -207,12 +219,13 @@ modes caused every overflow found and are worth recognising on sight:
 
 ```bash
 pnpm build    # astro check (typecheck) && astro build → dist/
-pnpm test     # vitest — the score model's arithmetic
+pnpm test     # vitest — the score model and the recommender's pure half
 ```
 
 `astro check` runs first, so a type error fails the build. `pnpm test` is not
-wired into `build`; it covers `src/lib/score/`, where the failure mode is a
-wrong number rather than a type error.
+wired into `build` and there is no CI, so nothing runs it automatically. It
+covers `src/lib/score/` and `src/lib/recommend.ts`, where the failure mode is a
+wrong number or a made-up pick rather than a type error.
 
 `@astrojs/vercel` is installed and wired in `astro.config.mjs`. `/api/recommend`
 is the one route that opts into SSR (`export const prerender = false`); the
@@ -225,7 +238,15 @@ Without it the route answers from the static bank (`REC_BANK`) with
 never sent to the browser.
 
 The site is deployed to Vercel at **https://sibi-gamers.vercel.app** (project
-`sibi-gamers`, personal scope, GitHub repo connected — pushes to `main` deploy).
+`sibi-gamers`, personal scope, GitHub repo connected).
+
+**Open:** production has never been built from Git. All three production
+deployments came from the CLI; the live one is
+`dpl_wacfCLSU38w55ZSSB7tcXByHb3JN`, made on 2026-08-30, and its assets match the
+code at `cde7b1a`. `main` is still the initial commit, and pushes to
+`SergioTellezSanchez/sibi-gamers-pnpm-migration` only create Preview deployments.
+Merge the branch and confirm in the dashboard that production builds from `main`;
+the API does not expose that setting.
 
 **Open:** `astro.config.mjs` sets `site: "https://sibigamers.gg"`, so every
 canonical and OG URL points at a domain that is not attached to the deployment
@@ -251,6 +272,9 @@ Break these and the model breaks with them:
   scores across three games, attributed to real outlets for games that do not
   exist. Curating real scores is manual work that has not started. See
   SCHEMA.md §4.
+- **The ranking is mostly hand-picked.** 17 of the 20 games have no rows, yet
+  they print a catalogue score and hold ranks. The game page labels that number
+  editorial; the homepage does not.
 - **All copy is placeholder.** Every verdict, headline, critic and studio name is
   invented and must be replaced before launch.
 - **Placeholder art everywhere.** The game page's key art, gallery and "More
@@ -258,8 +282,11 @@ Break these and the model breaks with them:
   button, here and in the homepage band, does nothing until there are assets.
 - **No store links.** The "Play on" rail lists storefronts as tags; affiliate
   links and prices are a Phase 3 item.
-- **Search is a 404.** The nav form posts to `/search`, which has no route.
+- **Search is a 404.** The nav form submits to `/search`, which has no route.
 - **Footer links go nowhere.** About, Contact, Press, Terms and Privacy resolve
   to `/`. Social icons are `#`. "How we score" now resolves.
 - **Homepage "View all" and "Full rankings" are `#`.** There is no full
   rankings page; the homepage shows the top 20 and that is the whole catalogue.
+- **No `sitemap.xml`, `robots.txt` or `og:image`.** `Base.astro` declares a
+  `summary_large_image` Twitter card with no image behind it. All three matter
+  to the SEO model in §1 and should land before indexing.

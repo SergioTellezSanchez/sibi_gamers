@@ -1,6 +1,6 @@
 # SIBI GAMERS — Documento Maestro del Proyecto
 
-> Última actualización: 3 de agosto de 2026
+> Última actualización: 6 de noviembre de 2026
 > Este documento se actualiza al final de cada sesión de trabajo.
 > Vive en la raíz del repo y es la única fuente de verdad del proyecto.
 
@@ -83,11 +83,13 @@ Portal de videojuegos con tres pilares de contenido y un diferenciador central:
 - [x] **Pase cross-device**: sin desbordamiento horizontal de 320px a 2560px (83 de 84
       combinaciones página×ancho limpias, la restante es 1px de redondeo), paso de 2
       columnas para tablet en el top 3, objetivos táctiles de 44px vía `pointer: coarse`,
-      y el contenedor crece a 1440/1560px por encima de 1600/2100px
-- [x] **Adapter de deploy** (`@astrojs/vercel`) — desplegado en https://sibi-gamers.vercel.app; ninguna ruta usa SSR todavía
+      y el contenedor crece a 1440/1560px por encima de 1600/2100px. Es anterior a las
+      páginas de juego y a `/how-we-score/`; no consta que se haya repetido
+- [x] **Adapter de deploy** (`@astrojs/vercel`) — desplegado en https://sibi-gamers.vercel.app; `/api/recommend` es la única ruta SSR
 - [x] **Sistema de score** (`src/lib/score/`) — normalización de cualquier escala a
       0-100 y agregados (media, mediana, histograma) derivados de las filas, nunca
-      almacenados. 16 tests con `pnpm test`. Falta la curación de datos reales
+      almacenados. 20 tests, 25 con los del recomendador (`pnpm test`). Falta la
+      curación de datos reales
 - [x] **Endpoint `/api/recommend`** con la API de Claude (`claude-opus-5`, salida
       estructurada, esfuerzo bajo, caché del catálogo). Única ruta SSR. Sin
       `ANTHROPIC_API_KEY` en Vercel responde con el banco estático y lo dice; la
@@ -351,7 +353,7 @@ Use invented placeholder data consistent with the homepage (e.g., Ashen Trials,
 - **Scores por fuente (MVP):** curación semiautomatizada de los 20-30 juegos top de 2026. Por juego: score de 10-15 outlets (IGN, GameSpot, PC Gamer, Eurogamer, Polygon…) + URL de la reseña original. Sin scraping masivo que viole ToS; los scores son datos factuales y siempre se enlaza a la fuente (modelo AOTY/OpenCritic). Respaldo: `aggregated_rating` de IGDB.
 - **Normalización:** resuelta. 9/10 → 90 · 4/5 → 80 · letras sobre 95/85/75/65 para A/B/C/D con ±3 según el sufijo (B+ → 88) · **mínimo de 5 fuentes** para publicar score, igual que OpenCritic. Sin ponderación por outlet en el MVP.
 - **Página "How we score":** metodología pública (fuentes, normalización, promedio). Bandera de transparencia contra la opacidad de Metacritic.
-- **Pendiente:** crear cuentas en dev.twitch.tv (IGDB) y rawg.io/apidocs; definir modelo de datos (games, sources, reviews) antes de Claude Code.
+- **Pendiente:** crear cuentas en dev.twitch.tv (IGDB) y rawg.io/apidocs. El modelo de datos ya está definido en [SCHEMA.md](SCHEMA.md).
 
 ## 11. Arquitectura técnica (estado actual del repo)
 
@@ -367,11 +369,13 @@ un LCP lento — justo lo contrario de lo que el modelo necesita. Astro entrega 
 completo por ruta, con su propio title, description y canonical, y solo hidrata las
 piezas que de verdad tienen estado.
 
-Medido en el build actual: **1.6–1.7 kB gz de JS** en las 37 páginas editoriales
-(artículos e índices) frente a los 129 kB gz del SPA que se descartó. **La home es
-la excepción: ~64 kB gz**, porque hidrata `RankingsBoard` con `client:load` y eso
-pone el runtime de React en la ruta crítica. Sigue ganando al SPA, pero no es la
-cifra de las otras 37. Detalle y palanca de mejora en [ARCHITECTURE.md](ARCHITECTURE.md) §4.
+Medido en el build de `cb1a397`, sin contar GSAP (se carga en idle): **1.6 kB gz de
+JS** en 55 páginas (artículos, juegos y "How we score") y **2.1 kB** en los tres
+índices, frente a los 129 kB gz del SPA que se descartó. **La home es la excepción:
+~95 kB gz**, porque hidrata `RankingsBoard` con `client:load`, lo que pone React en la
+ruta crítica, y porque las islas importan `data/games.ts`, que arrastra Zod, el
+catálogo y las 133 filas de score (unos 30 kB). Sigue ganando al SPA, pero no es la
+cifra de las otras 58. Detalle y palancas de mejora en [ARCHITECTURE.md](ARCHITECTURE.md) §4.
 
 ```
 src/
@@ -422,14 +426,26 @@ src/
    APIs (§8d), así que no se disfrazan de Markdown.
 
 **Deuda conocida:**
-- El recomendador está construido pero **sin clave en producción**: hasta que
-  `ANTHROPIC_API_KEY` exista en Vercel, responde con el banco estático y el pie lo
-  dice. Tampoco hay límite de peticiones por visitante; hay que ponerlo antes de
-  anunciar la función.
+- **El trabajo no está en `main`.** Todo lo posterior al commit inicial vive en la rama
+  `SergioTellezSanchez/sibi-gamers-pnpm-migration`, sin PR. Producción nunca se ha
+  construido desde Git: el sitio en vivo es un deploy manual por CLI del 30 de agosto de
+  2026, con el código de `cde7b1a`. Hay que fusionar la rama y confirmar en el panel de
+  Vercel que producción se construye desde `main`.
+- El recomendador está construido pero **en producción responde con el banco
+  estático**, y el pie lo dice: el proyecto de Vercel no tiene variables de entorno, así
+  que falta `ANTHROPIC_API_KEY`. Al añadirla hay que volver a desplegar. Tampoco hay
+  límite de peticiones por visitante; hay que ponerlo antes de anunciar la función.
 - Los 133 scores por outlet son inventados y se atribuyen a publicaciones reales
   sobre juegos que no existen. La aritmética sí es real y está testeada; las filas
   no. Curar datos reales (20-30 juegos, 10-15 outlets cada uno) es trabajo manual
   que no ha empezado.
+- 17 de los 20 juegos no tienen filas, pero muestran y ordenan el ranking con un score
+  elegido a mano, sin conteo de fuentes. La página de juego lo etiqueta como editorial;
+  la home no.
+- La home carga ~95 kB gz de JS, unos 30 kB de ellos datos y Zod que no hacen falta en
+  el cliente ([ARCHITECTURE.md](ARCHITECTURE.md) §4).
+- No hay `sitemap.xml`, `robots.txt` ni `og:image`, y no hay CI: nada ejecuta
+  `pnpm test` de forma automática.
 - `site` apunta a `sibigamers.gg`, dominio que aún no está conectado al deploy: todos
   los canonical y OG del sitio en vivo señalan a una URL que no resuelve. Aplazado a
   propósito; hay que resolverlo antes de pedir indexación.

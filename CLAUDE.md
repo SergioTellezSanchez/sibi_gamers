@@ -91,29 +91,42 @@ Built: homepage, three section indices, 34 article pages, 20 game pages
 (`src/lib/score/`), `/api/recommend` (the one SSR route — Claude picks five
 catalogue games under structured output; without `ANTHROPIC_API_KEY` it
 answers from the static bank and says so), the motion and filter systems, and
-a cross-device pass from 320px to 2560px. 25 tests.
+a cross-device pass from 320px to 2560px (run before the game pages existed,
+with no record of a re-run). 25 tests.
 
-Not built: real score data (three games are seeded, the rest publish no
-score), IGDB/RAWG metadata and art, search (the nav form posts to `/search`,
-which does not exist), the footer's About/Contact/Press/Terms/Privacy pages.
-`ANTHROPIC_API_KEY` is not yet set on Vercel, so the live recommender is on the
-bank.
+Not built: real score data (three games are seeded; the other 17 print a
+hand-picked score with no source count, labelled editorial only on the game
+page), IGDB/RAWG metadata and art, search (the nav form submits to `/search`,
+which does not exist), the footer's About/Contact/Press/Terms/Privacy pages,
+`sitemap.xml`, `robots.txt`, `og:image`, and CI (nothing runs `pnpm test`
+automatically). The live recommender answers from the bank: the Vercel project
+has no environment variables, so `ANTHROPIC_API_KEY` is not set.
 
-Deployed to https://sibi-gamers.vercel.app. The canonical URLs still say
-`sibigamers.gg`, a domain that is not attached yet — a known, deliberate gap.
+All of this lives on `SergioTellezSanchez/sibi-gamers-pnpm-migration`, pushed,
+with no PR. `main` is still the initial commit: no game pages, score model or
+recommender.
+
+Live at https://sibi-gamers.vercel.app from a manual CLI deployment made on
+2026-08-30 (`dpl_wacfCLSU38w55ZSSB7tcXByHb3JN`). Its assets match the code at
+`cde7b1a`; the one later commit is docs only. The project is linked to GitHub,
+and branch pushes create Preview deployments, but no production deployment has
+ever come from Git. The canonical URLs still say `sibigamers.gg`, a domain that
+is not attached yet — a known, deliberate gap.
 
 ## Next session
 
-In order. The first two need the owner; the rest do not.
+In order. The first three need the owner; the rest do not.
 
-1. `ANTHROPIC_API_KEY` on Vercel, then a per-visitor rate limit on
-   `/api/recommend` before the feature is announced.
-2. Decide which real games of 2026 the site ranks, and get IGDB (Twitch dev)
+1. Merge the branch into `main`, and confirm in the Vercel dashboard that
+   production builds from `main`.
+2. `ANTHROPIC_API_KEY` on Vercel, a redeploy so production picks it up, then a
+   per-visitor rate limit on `/api/recommend` before the feature is announced.
+3. Decide which real games of 2026 the site ranks, and get IGDB (Twitch dev)
    and RAWG credentials. Everything in `data/` is fictional until then.
-3. Real score curation into `scores.ts`, one game at a time; each game's
+4. Real score curation into `scores.ts`, one game at a time; each game's
    `score` in the catalogue must equal its computed mean (a test enforces it).
-4. Search: either a route for the nav form or remove the form.
-5. The `sibigamers.gg` canonical, last.
+5. Search: either a route for the nav form or remove the form.
+6. The `sibigamers.gg` canonical, last.
 
 ## Conventions
 
