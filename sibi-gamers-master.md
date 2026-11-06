@@ -1,6 +1,6 @@
 # SIBI GAMERS — Documento Maestro del Proyecto
 
-> Última actualización: 3 de agosto de 2026
+> Última actualización: 6 de noviembre de 2026
 > Este documento se actualiza al final de cada sesión de trabajo.
 > Vive en la raíz del repo y es la única fuente de verdad del proyecto.
 
@@ -66,9 +66,10 @@ Portal de videojuegos con tres pilares de contenido y un diferenciador central:
 ### Fase 2 — Diseño (Claude Design)
 - [x] **Design system** (logo de flama geométrica estilo bordado mazahua, tokens, tipografía, componentes, motion GSAP) — completado
 - [x] Homepage — completada (top 3 + tabla 4-20 con metadata rica, recomendador, noticias, reviews, banda de descargas)
-- [ ] **Página de detalle de juego (siguiente): prompt en sección 8c** — va por el flujo Design→Code, NO se diseña en código
-- [ ] Plantilla de artículo (noticia/reseña/guía)
-- [ ] Módulo del recomendador IA
+- [x] **Página de detalle de juego** — canvas en `.design/`, dirección A (Broadsheet) elegida, implementada en código
+- [x] ~~Plantilla de artículo (noticia/reseña/guía)~~ — **resuelto en código**, no pasa
+      por Claude Design (ver registro de decisiones, Ago 2026)
+- [x] ~~Módulo del recomendador IA~~ — resuelto dentro del diseño de la home (`PromptBox`); el endpoint es de Fase 3
 
 ### Fase 3 — Desarrollo (Claude Code)
 - [x] **Stack decidido: Astro + islas React + GSAP** (ver §11 y registro de decisiones)
@@ -76,11 +77,33 @@ Portal de videojuegos con tres pilares de contenido y un diferenciador central:
 - [x] Índices de Reviews / News / Guides — **construidos code-first**, no pasaron por Claude Design. Consumen estrictamente los tokens y componentes de `src/ds/`. Se pueden empujar a Claude Design vía `/design-sync` para pulido visual si hace falta.
 - [x] Contenido editorial en Markdown (content collections de Astro)
 - [x] Sistema de motion completo según §8b (count-up al entrar en viewport, barra que se expande en hover, flicker del logomark)
-- [ ] Adapter de deploy (Vercel/Netlify) para habilitar rutas SSR
-- [ ] Endpoint `/api/recommend` con la API de Claude (reservado, requiere adapter)
-- [ ] Página de detalle de juego (cuando llegue el diseño de Fase 2)
+- [x] **Páginas de detalle de artículo** para reviews, noticias y guías (`[slug].astro`),
+      con migas, prev/next, JSON-LD por tipo y `og:type=article`. El sitio pasó de 4 a
+      38 páginas rastreables; los 34 artículos en Markdown ya son alcanzables
+- [x] **Pase cross-device**: sin desbordamiento horizontal de 320px a 2560px (83 de 84
+      combinaciones página×ancho limpias, la restante es 1px de redondeo), paso de 2
+      columnas para tablet en el top 3, objetivos táctiles de 44px vía `pointer: coarse`,
+      y el contenedor crece a 1440/1560px por encima de 1600/2100px. Es anterior a las
+      páginas de juego y a `/how-we-score/`; no consta que se haya repetido
+- [x] **Adapter de deploy** (`@astrojs/vercel`) — desplegado en https://sibi-gamers.vercel.app; `/api/recommend` es la única ruta SSR
+- [x] **Sistema de score** (`src/lib/score/`) — normalización de cualquier escala a
+      0-100 y agregados (media, mediana, histograma) derivados de las filas, nunca
+      almacenados. 20 tests, 25 con los del recomendador (`pnpm test`). Falta la
+      curación de datos reales
+- [x] **Endpoint `/api/recommend`** con la API de Claude (`claude-opus-5`, salida
+      estructurada, esfuerzo bajo, caché del catálogo). Única ruta SSR. Sin
+      `ANTHROPIC_API_KEY` en Vercel responde con el banco estático y lo dice; la
+      clave hay que añadirla en el proyecto de Vercel
+- [x] **Página de detalle de juego** (`/games/[slug]/`, 20 páginas) según la dirección A:
+      key art, tira de score, desglose por fuente con histograma, rail con tienda /
+      reseña / guías / noticias, galería, ficha y "más como este". JSON-LD
+      `VideoGame` con `aggregateRating` solo cuando hay score publicado
+- [x] **Página "How we score"** (`/how-we-score/`) que renderiza las mismas tablas que
+      usa el código, para que no diverjan
+- [x] **Catálogo único de juegos** (`GAMES` en `games.ts`): ranking, podio, páginas de
+      juego, recomendador y conteo de fuentes derivan de él
 - [ ] Base de datos de juegos alimentada por APIs (RAWG, IGDB) para metadata e imágenes
-- [ ] Sistema de score agregado
+- [ ] Curación de scores reales (20-30 juegos, 10-15 outlets cada uno)
 - [ ] Pipeline de contenido automatizado con Claude (noticias/borradores)
 
 ### Fase 4 — Contenido inicial
@@ -321,13 +344,21 @@ Use invented placeholder data consistent with the homepage (e.g., Ashen Trials,
 
 ## 8d. Plan de datos (sistema de score)
 
+> **Ya construido** en `src/lib/score/`. El modelo, las reglas de normalización
+> publicables, los umbrales y lo que sigue faltando están en
+> [SCHEMA.md](SCHEMA.md) §4. Lo de abajo es el plan original y se mantiene como
+> registro de las restricciones de origen.
+
 - **Metadata e imágenes:** IGDB API (vía cuenta dev de Twitch, gratis) + RAWG API. Alimentan nombres, portadas, screenshots, géneros, plataformas, estudios — y el feature de imágenes HQ.
 - **Scores por fuente (MVP):** curación semiautomatizada de los 20-30 juegos top de 2026. Por juego: score de 10-15 outlets (IGN, GameSpot, PC Gamer, Eurogamer, Polygon…) + URL de la reseña original. Sin scraping masivo que viole ToS; los scores son datos factuales y siempre se enlaza a la fuente (modelo AOTY/OpenCritic). Respaldo: `aggregated_rating` de IGDB.
-- **Normalización:** 9/10 → 90 · 4/5 → 80 · letter grades (B+ → 78, etc.) · definir mínimo de fuentes para publicar score.
+- **Normalización:** resuelta. 9/10 → 90 · 4/5 → 80 · letras sobre 95/85/75/65 para A/B/C/D con ±3 según el sufijo (B+ → 88) · **mínimo de 5 fuentes** para publicar score, igual que OpenCritic. Sin ponderación por outlet en el MVP.
 - **Página "How we score":** metodología pública (fuentes, normalización, promedio). Bandera de transparencia contra la opacidad de Metacritic.
-- **Pendiente:** crear cuentas en dev.twitch.tv (IGDB) y rawg.io/apidocs; definir modelo de datos (games, sources, reviews) antes de Claude Code.
+- **Pendiente:** crear cuentas en dev.twitch.tv (IGDB) y rawg.io/apidocs. El modelo de datos ya está definido en [SCHEMA.md](SCHEMA.md).
 
 ## 11. Arquitectura técnica (estado actual del repo)
+
+> Resumen. El detalle técnico vive en [ARCHITECTURE.md](ARCHITECTURE.md) y los
+> esquemas de datos en [SCHEMA.md](SCHEMA.md); ahí se actualizan, no aquí.
 
 **Stack: Astro 7 + islas React 19 + GSAP 3 + TypeScript.**
 
@@ -338,25 +369,41 @@ un LCP lento — justo lo contrario de lo que el modelo necesita. Astro entrega 
 completo por ruta, con su propio title, description y canonical, y solo hidrata las
 piezas que de verdad tienen estado.
 
-Medido en el build actual: **1.7 kB gz de JS por página** frente a los 129 kB gz del
-SPA que se descartó.
+Medido en el build de `cb1a397`, sin contar GSAP (se carga en idle): **1.6 kB gz de
+JS** en 55 páginas (artículos, juegos y "How we score") y **2.1 kB** en los tres
+índices, frente a los 129 kB gz del SPA que se descartó. **La home es la excepción:
+~95 kB gz**, porque hidrata `RankingsBoard` con `client:load`, lo que pone React en la
+ruta crítica, y porque las islas importan `data/games.ts`, que arrastra Zod, el
+catálogo y las 133 filas de score (unos 30 kB). Sigue ganando al SPA, pero no es la
+cifra de las otras 58. Detalle y palancas de mejora en [ARCHITECTURE.md](ARCHITECTURE.md) §4.
 
 ```
 src/
   pages/            una ruta por archivo → HTML estático
+    reviews/[slug]  · news/[slug] · guides/[slug] — detalle de artículo,
+                    getStaticPaths sobre la colección; prev/next y JSON-LD
+    games/[slug]    página de juego (dirección A); desglose por fuente,
+                    histograma, JSON-LD VideoGame con aggregateRating
+    how-we-score    las reglas de normalización, renderizadas desde el código
+    api/recommend   la ÚNICA ruta SSR: Claude elige 5 juegos del catálogo
   layouts/Base      shell + <head> por página (title, description, canonical, OG)
   content/          reviews · news · guides en Markdown (content collections)
   content.config.ts esquemas Zod que validan el frontmatter en cada build
   ds/               design system portado del bundle de Claude Design
     tokens/         colors · typography · spacing · fonts — copiados literales
   components/       componentes .astro (cero JS en cliente)
+    ArticleShell    migas + medida de lectura + prev/next, compartido por
+                    las tres secciones; la cabecera llega por slot
   islands/          los ÚNICOS componentes React que se hidratan:
                       RankingsBoard  selector década/año + ranking
                       PromptBox      recomendador
   scripts/
     motion.ts       GSAP para todo el sitio, vía data-attributes
     filters.ts      filtros de Reviews/News/Guides sin framework (428 B gz)
-  data/games.ts     datos estructurados de juegos (futuro: IGDB/RAWG)
+  lib/score/        normalización + agregados; lib/recommend.ts, la parte pura del endpoint
+  data/games.ts     el catálogo (20 juegos); todo lo demás deriva de él (futuro: IGDB/RAWG)
+  data/outlets.ts   53 outlets y sus escalas
+  data/scores.ts    133 filas placeholder de score por outlet, 3 juegos
 ```
 
 **Reglas que sostienen la arquitectura:**
@@ -379,9 +426,36 @@ src/
    APIs (§8d), así que no se disfrazan de Markdown.
 
 **Deuda conocida:**
-- Falta el adapter de deploy; sin él no hay rutas SSR y el recomendador sigue con un
-  banco de recomendaciones estático.
-- Todos los enlaces de tarjeta apuntan a `#`: no existen rutas de detalle todavía.
+- **El trabajo no está en `main`.** Todo lo posterior al commit inicial vive en la rama
+  `SergioTellezSanchez/sibi-gamers-pnpm-migration`, sin PR. Producción nunca se ha
+  construido desde Git: el sitio en vivo es un deploy manual por CLI del 30 de agosto de
+  2026, con el código de `cde7b1a`. Hay que fusionar la rama y confirmar en el panel de
+  Vercel que producción se construye desde `main`.
+- El recomendador está construido pero **en producción responde con el banco
+  estático**, y el pie lo dice: el proyecto de Vercel no tiene variables de entorno, así
+  que falta `ANTHROPIC_API_KEY`. Al añadirla hay que volver a desplegar. Tampoco hay
+  límite de peticiones por visitante; hay que ponerlo antes de anunciar la función.
+- Los 133 scores por outlet son inventados y se atribuyen a publicaciones reales
+  sobre juegos que no existen. La aritmética sí es real y está testeada; las filas
+  no. Curar datos reales (20-30 juegos, 10-15 outlets cada uno) es trabajo manual
+  que no ha empezado.
+- 17 de los 20 juegos no tienen filas, pero muestran y ordenan el ranking con un score
+  elegido a mano, sin conteo de fuentes. La página de juego lo etiqueta como editorial;
+  la home no.
+- La home carga ~95 kB gz de JS, unos 30 kB de ellos datos y Zod que no hacen falta en
+  el cliente ([ARCHITECTURE.md](ARCHITECTURE.md) §4).
+- No hay `sitemap.xml`, `robots.txt` ni `og:image`, y no hay CI: nada ejecuta
+  `pnpm test` de forma automática.
+- `site` apunta a `sibigamers.gg`, dominio que aún no está conectado al deploy: todos
+  los canonical y OG del sitio en vivo señalan a una URL que no resuelve. Aplazado a
+  propósito; hay que resolverlo antes de pedir indexación.
+- Todo el arte es placeholder: key art, galería y portadas son degradados. El botón
+  "Download all in high quality" no hace nada hasta que existan assets.
+- "Play on" lista tiendas como etiquetas; sin enlaces de afiliado ni precios todavía.
+- El buscador de la barra envía a `/search`, ruta que no existe (404).
+- "View all" / "Full rankings" en la home siguen en `#`: no hay página de ranking
+  completo porque el catálogo entero ya es el top 20. Los iconos sociales del footer
+  también siguen en `#` (Fase 1).
 - Todo el copy (verdicts, headlines, guías, nombres de críticos) es placeholder
   inventado. Hay que reemplazarlo antes de cualquier lanzamiento.
 
@@ -404,4 +478,13 @@ src/
 | Ago 2026 | **Stack: Astro + islas React + GSAP.** Razón: el negocio es SEO-first (§5), y un SPA cliente no entrega HTML rastreable ni meta por ruta. Se descartó un primer prototipo en Vite + React Router (129 kB gz de JS) y se portó antes de añadir páginas nuevas, mientras el costo de migración era bajo |
 | Ago 2026 | Contenido editorial (reviews, noticias, guías) en Markdown vía content collections con esquemas Zod. Los datos de juegos siguen en TypeScript porque vendrán de IGDB/RAWG |
 | Ago 2026 | Reviews / News / Guides se construyen **code-first** sobre el design system, sin esperar re-derivación en Claude Design. La página de detalle de juego SÍ pasa por Design→Code por ser la página de ingresos |
+| Ago 2026 | **Plantilla de artículo en código, no en Claude Design.** Fase 2 la listaba como entregable de diseño, pero se resolvió por el precedente de los índices: lo editorial se construye code-first sobre el design system y solo la página de juego pasa por Design→Code. Desbloquea 34 artículos que ya existían en Markdown pero no tenían ruta |
+| Ago 2026 | **Score mínimo de 5 fuentes para publicar**, igual que OpenCritic, y **sin ponderación por outlet** en el MVP (`weight` existe pero se ignora, para no migrar datos después). Una reseña revisada reemplaza a la original: una fila por outlet, gana la más reciente |
+| Ago 2026 | **`sourceCount` deja de escribirse a mano.** Sale de `sourceCountFor()`, que cuenta filas reales, o no se renderiza. Los 17 juegos sin filas dejaron de mostrar un número inventado, y el campo salió del frontmatter de las reseñas: la reseña es un crítico, el agregado es del juego |
+| Ago 2026 | **El recomendador nunca falla hacia el usuario.** Sin clave, con rate limit, con rechazo o con respuesta mal formada, devuelve el banco estático con `source: "bank"` y la isla lo etiqueta. Un fallback que parece real es una mentira; uno etiquetado es una degradación honesta |
+| Ago 2026 | **El modelo solo redacta los motivos.** Los ids se validan contra el catálogo y título y score salen de ahí, no de la respuesta: el modelo no puede inventar un juego ni un número |
+| Ago 2026 | **Un solo catálogo de juegos.** La identidad de un juego estaba repartida entre dos arrays en `games.ts`, el frontmatter de las reseñas y `scores.ts`, unidos por slug del título. Ahora `GAMES` es la única fuente y el `id` explícito es la clave de ruta y de score. Las reseñas siguen indexadas por título porque las escriben personas |
+| Ago 2026 | **El key art de la página de juego llena el contenedor, no el viewport.** Un full-bleed real (`margin: calc(50% - 50vw)`) desborda por el ancho de la barra de scroll en todo SO que la dibuje, y el sitio garantiza cero desbordamiento horizontal |
+| Ago 2026 | **"Mostrar las 51 fuentes" es un `<details>` nativo.** Todas las filas van en el HTML y nada hidrata: cumple los invariantes 1 y 2 sin excepción para la página de ingresos |
+| Ago 2026 | **Gestor de paquetes: pnpm** (`packageManager` fijado, `pnpm-workspace.yaml` con `allowBuilds: esbuild`). Se descartó npm; el lockfile se regeneró desde cero |
 | Ago 2026 | GSAP se carga en idle y no se carga con reduced-motion: el motion es aditivo, nunca requisito para leer |

@@ -1,18 +1,28 @@
 # Sibi Gamers
 
 Critic-aggregated game rankings, reviews, news and guides.
-Project direction, roadmap and decision log live in
-[sibi-gamers-master.md](sibi-gamers-master.md) — that document is the source of truth;
-this one only covers running the code.
+
+| Document | For |
+| --- | --- |
+| [sibi-gamers-master.md](sibi-gamers-master.md) | Source of truth — brand, roadmap, decision log |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | How the code works and the invariants behind it |
+| [SCHEMA.md](SCHEMA.md) | Data shapes; what is real vs proposed |
+| [CLAUDE.md](CLAUDE.md) | Orientation for AI coding sessions |
+
+This file only covers running the code.
 
 **Stack:** Astro 7 · React 19 (islands only) · TypeScript · GSAP 3
 
+This project uses **pnpm** (see `packageManager` in `package.json`).
+If you don't have it: `corepack enable` or `npm i -g pnpm`.
+
 ```bash
-npm install
-npm run dev       # http://localhost:4321
-npm run build     # astro check && astro build
-npm run preview   # serve the production build
-npm run lint      # oxlint
+pnpm install
+pnpm dev       # http://localhost:4321
+pnpm build     # astro check && astro build → 59 pages + one function
+pnpm test      # vitest — score model and recommender logic
+pnpm preview   # serve the production build
+pnpm lint      # oxlint
 ```
 
 ## Routes
@@ -23,6 +33,10 @@ npm run lint      # oxlint
 | `/reviews/` | `content/reviews/*.md` | score-band filter (no framework) |
 | `/news/` | `content/news/*.md` | category filter (no framework) |
 | `/guides/` | `content/guides/*.md` | type filter (no framework) |
+| `/reviews/[slug]/` · `/news/[slug]/` · `/guides/[slug]/` | the same Markdown | none |
+| `/games/[slug]/` | `data/games.ts` catalogue | none — "show all sources" is a `<details>` |
+| `/how-we-score/` | `pages/how-we-score.astro` | none |
+| `POST /api/recommend` | `pages/api/recommend.ts` | the one server route (Vercel function) |
 
 ## Layout
 
@@ -36,10 +50,14 @@ src/
     tokens/         colors · typography · spacing · fonts (copied verbatim)
   components/       .astro components — zero client JS
   islands/          the only React that hydrates
+  pages/api/        recommend.ts — Claude API, SSR; lib/recommend.ts is its pure half
+  lib/score/        normalization + aggregation, unit-tested
   scripts/
     motion.ts       all site motion, via data-attributes
     filters.ts      list filtering, 428 B gz
-  data/games.ts     structured game data (IGDB/RAWG later)
+  data/games.ts     the catalogue; everything derives from it (IGDB/RAWG later)
+  data/outlets.ts   outlets and their scales
+  data/scores.ts    per-outlet score rows (placeholder)
   styles/app.css    page styles + the design's token overrides
 ```
 
@@ -62,7 +80,9 @@ whichever subset the default filter selects, and the pages work identically befo
 Scores render their final value in the HTML and reveals only fade content *in*, so if
 the script never runs the page is complete and correct — just still.
 
-Result: **1.7 kB gz of JS per page**, versus 129 kB gz for the Vite SPA this replaced.
+Result: **1.6 kB gz of JS on most pages** and 2.1 kB on the three section indices, versus
+129 kB gz for the Vite SPA this replaced. The homepage is the exception at ~95 kB gz; see
+[ARCHITECTURE.md](ARCHITECTURE.md) §4.
 
 ## Content
 
@@ -75,11 +95,19 @@ feature at the top of its section.
 
 ## Known gaps
 
-- **No deploy adapter yet.** Static output only. Adding Vercel/Netlify unlocks
-  `export const prerender = false`, which is the path for the `/api/recommend` endpoint
-  backed by the Claude API. Until then the recommender returns a fixed bank.
-- **Card links point to `#`.** Detail routes don't exist yet; the game detail page is
-  next and goes through Claude Design first (master doc §8c).
+- **The work is not on `main`.** Everything past the initial commit is on
+  `SergioTellezSanchez/sibi-gamers-pnpm-migration`, with no PR.
+- **Deployed at https://sibi-gamers.vercel.app**, but canonical URLs still say
+  `sibigamers.gg`, which is not attached. Settle before asking for indexing.
+- **No `sitemap.xml`, `robots.txt` or `og:image`.** Add them before asking for indexing.
+- **No CI.** Nothing runs `pnpm test` automatically.
+- **The recommender is on the static bank in production** until `ANTHROPIC_API_KEY`
+  is set on the Vercel project (`vercel env add ANTHROPIC_API_KEY production`) and
+  production is redeployed. The island labels bank answers. No per-visitor rate limit
+  yet.
+- **Score data is invented.** The arithmetic is real and tested; the 133 rows behind
+  three games are placeholders. The other 17 games have no aggregate: they print a
+  hand-picked score with no source count.
 - **All copy is placeholder.** Verdicts, headlines, guide text and every critic byline
   are invented, sized to exercise the layouts. Replace before launch.
 - **Fonts are substitutes.** Big Shoulders and IBM Plex Sans stand in via Google Fonts;

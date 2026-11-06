@@ -1,0 +1,276 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders:wght@600;700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    :root {
+      --ink: #03071E; --bordeaux: #370617; --cherry: #6A040F; --oxblood: #9D0208;
+      --ember: #D00000; --ochre: #DC2F02; --cayenne: #E85D04; --saffron: #F48C06;
+      --orange: #FAA307; --amber: #FFBA08; --white: #F5F3F0; --gray: #9A938E;
+      --display: "Big Shoulders", "Arial Narrow", sans-serif;
+      --body: "IBM Plex Sans", -apple-system, "Segoe UI", sans-serif;
+      --mono: "IBM Plex Mono", ui-monospace, monospace;
+    }
+    body { margin: 0; background: var(--ink); color: var(--white); font-family: var(--body); -webkit-font-smoothing: antialiased; }
+    a { color: var(--saffron); text-decoration: none; }
+    a:hover { color: var(--amber); }
+    .shell { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+    .eyebrow { font: 600 12px/1.2 var(--body); text-transform: uppercase; letter-spacing: 0.12em; color: var(--gray); }
+    .tag { display: inline-block; font-family: var(--body); font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 999px; background: var(--bordeaux); color: var(--gray); border: 1px solid var(--cherry); }
+    .tag--accent { background: transparent; color: var(--saffron); border: 1px solid var(--saffron); }
+    .btn { display: inline-flex; align-items: center; gap: 8px; border: none; border-radius: 3px; font-family: var(--body); font-weight: 600; font-size: 14px; padding: 12px 24px; cursor: pointer; }
+    .btn--primary { background: var(--amber); color: var(--ink); }
+    .btn--ghost { background: transparent; color: var(--white); border: 1px solid var(--cherry); }
+    .rule { height: 1px; background: var(--cherry); border: 0; margin: 0; }
+    .srcrow { display: grid; grid-template-columns: minmax(0,1fr) 92px 76px 28px; align-items: center; gap: 20px; padding: 14px 0; border-bottom: 1px solid var(--cherry); }
+  </style>
+</helmet>
+
+<div style="background: #03071E; min-height: 100%;">
+
+  <!-- nav -->
+  <header style="border-bottom: 1px solid #6A040F; background: #03071E;">
+    <div class="shell" style="display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center; gap: 24px; padding-top: 18px; padding-bottom: 18px;">
+      <a href="#" style="display: flex; align-items: center; gap: 10px; justify-self: start;">
+        <svg viewBox="0 0 100 140" width="26" height="26" style="display: block;"><polygon points="50,140 30,120 38,100 22,82 34,64 24,46 40,30 34,14 50,0 66,14 60,30 76,46 66,64 78,82 62,100 70,120 50,140" fill="#FFBA08"></polygon></svg>
+        <span style="font-family: var(--display); font-weight: 800; font-size: 25px; line-height: 1; color: #FFBA08; letter-spacing: 0.01em; text-transform: uppercase;">Sibi Gamers</span>
+      </a>
+      <nav style="display: flex; gap: 40px; justify-self: center;">
+        <span style="font-size: 14px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #9A938E;">Rankings</span>
+        <span style="font-size: 14px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #9A938E;">Reviews</span>
+        <span style="font-size: 14px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #9A938E;">News</span>
+        <span style="font-size: 14px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #9A938E;">Guides</span>
+      </nav>
+      <div style="justify-self: end;">
+        <div style="background: #370617; border: 1px solid #6A040F; border-radius: 3px; padding: 9px 14px; color: #5A554F; font-size: 13px; width: 240px;">Search games, studios, people</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- full-bleed key art -->
+  <div style="position: relative; height: 560px; overflow: hidden;">
+    <svg viewBox="0 0 1440 560" preserveAspectRatio="xMidYMid slice" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+      <defs>
+        <radialGradient id="a1" cx="26%" cy="34%" r="72%">
+          <stop offset="0%" stop-color="#FAA307"></stop>
+          <stop offset="34%" stop-color="#DC2F02"></stop>
+          <stop offset="68%" stop-color="#6A040F"></stop>
+          <stop offset="100%" stop-color="#03071E"></stop>
+        </radialGradient>
+        <linearGradient id="a2" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0%" stop-color="#03071E" stop-opacity="0.96"></stop>
+          <stop offset="52%" stop-color="#370617" stop-opacity="0.30"></stop>
+          <stop offset="100%" stop-color="#03071E" stop-opacity="0.10"></stop>
+        </linearGradient>
+        <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3"></feTurbulence><feColorMatrix type="saturate" values="0"></feColorMatrix></filter>
+      </defs>
+      <rect width="1440" height="560" fill="url(#a1)"></rect>
+      <g opacity="0.30">
+        <polygon points="1120,560 1010,470 1054,370 964,286 1030,186 974,102 1062,20 1030,-60 1120,-140 1210,-60 1178,20 1266,102 1210,186 1276,286 1186,370 1230,470 1120,560" fill="#03071E"></polygon>
+      </g>
+      <rect width="1440" height="560" fill="url(#a2)"></rect>
+      <rect width="1440" height="560" filter="url(#grain)" opacity="0.16"></rect>
+    </svg>
+
+    <div class="shell" style="position: relative; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 40px;">
+      <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 16px;">
+        <span class="tag tag--accent">Action RPG</span>
+        <span class="tag">PC</span>
+        <span class="tag">PS5</span>
+      </div>
+      <h1 style="font-family: var(--display); font-weight: 800; font-size: 132px; line-height: 0.88; letter-spacing: -0.01em; color: #F5F3F0; margin: 0; max-width: 15ch; text-wrap: balance;">Ashen Trials</h1>
+      <p style="font: 400 22px/1.4 var(--body); color: #F5F3F0; opacity: 0.86; margin: 20px 0 0; max-width: 58ch;">A generational action RPG that trusts you completely.</p>
+    </div>
+  </div>
+
+  <!-- score strip -->
+  <div style="border-top: 1px solid #6A040F; border-bottom: 1px solid #6A040F; background: #060B26;">
+    <div class="shell" style="display: flex; align-items: center; gap: 48px; padding-top: 28px; padding-bottom: 28px;">
+      <div style="display: flex; flex-direction: column; align-items: center; font-family: var(--display); color: #FFBA08; flex-shrink: 0;">
+        <div style="font: 800 96px/0.9 var(--display); font-variant-numeric: tabular-nums;">94</div>
+        <div style="width: 40px; height: 4px; margin-top: 10px; background: currentColor;"></div>
+        <div style="font: 500 12px/1.4 var(--body); color: #9A938E; margin-top: 8px; white-space: nowrap;">based on 51 sources</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 32px; flex: 1;">
+        <div style="display: flex; flex-direction: column; gap: 6px;"><span class="eyebrow">Studio</span><span style="font: 600 16px/1.3 var(--body);">Vault Nine</span></div>
+        <div style="display: flex; flex-direction: column; gap: 6px;"><span class="eyebrow">Released</span><span style="font: 600 16px/1.3 var(--body);">28 Jul 2026</span></div>
+        <div style="display: flex; flex-direction: column; gap: 6px;"><span class="eyebrow">Length</span><span style="font: 600 16px/1.3 var(--body);">42 hours</span></div>
+        <div style="display: flex; flex-direction: column; gap: 6px;"><span class="eyebrow">Rank this year</span><span style="font: 600 16px/1.3 var(--body); color: #FFBA08;">#1 of 2026</span></div>
+      </div>
+
+      <a href="#" style="font: 600 13px/1.2 var(--body); text-transform: uppercase; letter-spacing: 0.12em; flex-shrink: 0;">How we score &rarr;</a>
+    </div>
+  </div>
+
+  <!-- main two-column -->
+  <div class="shell" style="display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); gap: 64px; padding-top: 64px; padding-bottom: 64px; align-items: start;">
+
+    <!-- left: the breakdown, the whole point of the page -->
+    <div>
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 24px; margin-bottom: 8px;">
+        <h2 style="font: 700 40px/1.05 var(--display); letter-spacing: -0.01em; margin: 0;">Score breakdown</h2>
+        <span class="eyebrow">Showing 12 of 51</span>
+      </div>
+      <p style="font: 400 16px/1.5 var(--body); color: #9A938E; margin: 0 0 24px; max-width: 62ch;">Every source we counted, its score in its own format, and what that becomes on our 0&ndash;100 scale. Every row links to the original review.</p>
+
+      <div style="border-top: 1px solid #6A040F;">
+        <div class="srcrow" style="padding-top: 12px; padding-bottom: 12px;">
+          <span class="eyebrow">Outlet</span><span class="eyebrow" style="text-align: right;">Original</span><span class="eyebrow" style="text-align: right;">Normalized</span><span></span>
+        </div>
+
+        <div class="srcrow"><span style="font: 600 17px/1.3 var(--body);">IGN</span><span style="font-family: var(--mono); font-size: 14px; color: #9A938E; text-align: right;">10 / 10</span><span style="font: 800 24px/1 var(--display); color: #FFBA08; text-align: right; font-variant-numeric: tabular-nums;">100</span><span style="text-align: right;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9A938E" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"></path></svg></span></div>
+        <div class="srcrow"><span style="font: 600 17px/1.3 var(--body);">Giant Bomb</span><span style="font-family: var(--mono); font-size: 14px; color: #9A938E; text-align: right;">5 / 5</span><span style="font: 800 24px/1 var(--display); color: #FFBA08; text-align: right; font-variant-numeric: tabular-nums;">100</span><span style="text-align: right;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9A938E" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"></path></svg></span></div>
+        <div class="srcrow"><span style="font: 600 17px/1.3 var(--body);">Polygon</span><span style="font-family: var(--mono); font-size: 14px; color: #9A938E; text-align: right;">9.5 / 10</span><span style="font: 800 24px/1 var(--display); color: #FFBA08; text-align: right; font-variant-numeric: tabular-nums;">95</span><span style="text-align: right;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9A938E" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"></path></svg></span></div>
+        <div class="srcrow"><span style="font: 600 17px/1.3 var(--body);">Eurogamer</span><span style="font-family: var(--mono); font-size: 14px; color: #9A938E; text-align: right;">Essential</span><span style="font: 800 24px/1 var(--display); color: #FFBA08; text-align: right; font-variant-numeric: tabular-nums;">95</span><span style="text-align: right;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9A938E" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"></path></svg></span></div>
+        <div class="srcrow"><span style="font: 600 17px/1.3 var(--body);">PC Gamer</span><span style="font-family: var(--mono); font-size: 14px; color: #9A938E; text-align: right;">94 / 100</span><span style="font: 800 24px/1 var(--display); color: #FFBA08; text-align: right; font-variant-numeric: tabular-nums;">94</span><span style="text-align: right;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9A938E" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"></path></svg></span></div>
+        <div class="srcrow"><span style="font: 600 17px/1.3 var(--body);">Digital Foundry</span><span style="font-family: var(--mono); font-size: 14px; color: #9A938E; text-align: right;">A</span><span style="font: 800 24px/1 var(--display); color: #FFBA08; text-align: right; font-variant-numeric: tabular-nums;">93</span><span style="text-align: right;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9A938E" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"></path></svg></span></div>
+        <div class="srcrow"><span style="font: 600 17px/1.3 var(--body);">Rock Paper Shotgun</span><span style="font-family: var(--mono); font-size: 14px; color: #9A938E; text-align: right;">Recommended</span><span style="font: 800 24px/1 var(--display); color: #FFBA08; text-align: right; font-variant-numeric: tabular-nums;">92</span><span style="text-align: right;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9A938E" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"></path></svg></span></div>
+        <div class="srcrow"><span style="font: 600 17px/1.3 var(--body);">Edge</span><span style="font-family: var(--mono); font-size: 14px; color: #9A938E; text-align: right;">9 / 10</span><span style="font: 800 24px/1 var(--display); color: #FFBA08; text-align: right; font-variant-numeric: tabular-nums;">90</span><span style="text-align: right;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9A938E" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"></path></svg></span></div>
+        <div class="srcrow"><span style="font: 600 17px/1.3 var(--body);">GameSpot</span><span style="font-family: var(--mono); font-size: 14px; color: #9A938E; text-align: right;">9 / 10</span><span style="font: 800 24px/1 var(--display); color: #FFBA08; text-align: right; font-variant-numeric: tabular-nums;">90</span><span style="text-align: right;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9A938E" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"></path></svg></span></div>
+        <div class="srcrow"><span style="font: 600 17px/1.3 var(--body);">GamesRadar+</span><span style="font-family: var(--mono); font-size: 14px; color: #9A938E; text-align: right;">4.5 / 5</span><span style="font: 800 24px/1 var(--display); color: #FFBA08; text-align: right; font-variant-numeric: tabular-nums;">90</span><span style="text-align: right;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9A938E" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"></path></svg></span></div>
+        <div class="srcrow"><span style="font: 600 17px/1.3 var(--body);">Push Square</span><span style="font-family: var(--mono); font-size: 14px; color: #9A938E; text-align: right;">9 / 10</span><span style="font: 800 24px/1 var(--display); color: #FFBA08; text-align: right; font-variant-numeric: tabular-nums;">90</span><span style="text-align: right;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9A938E" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"></path></svg></span></div>
+        <div class="srcrow"><span style="font: 600 17px/1.3 var(--body);">Shacknews</span><span style="font-family: var(--mono); font-size: 14px; color: #9A938E; text-align: right;">8.5 / 10</span><span style="font: 800 24px/1 var(--display); color: #F48C06; text-align: right; font-variant-numeric: tabular-nums;">85</span><span style="text-align: right;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9A938E" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"></path></svg></span></div>
+      </div>
+
+      <button class="btn btn--ghost" style="margin-top: 24px;">Show all 51 sources</button>
+
+      <!-- histogram -->
+      <div style="margin-top: 56px;">
+        <h3 style="font: 600 28px/1.15 var(--display); margin: 0 0 4px;">Distribution</h3>
+        <p style="font: 400 14px/1.5 var(--body); color: #9A938E; margin: 0 0 28px;">Where the 51 sources landed. Mean 94, median 94.</p>
+        <div style="display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 16px; align-items: end; height: 180px;">
+          <div style="display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; height: 100%;"><span style="font: 800 20px/1 var(--display); color: #9A938E;">2</span><div style="height: 11%; background: #F48C06; border-radius: 3px 3px 0 0;"></div></div>
+          <div style="display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; height: 100%;"><span style="font: 800 20px/1 var(--display); color: #9A938E;">6</span><div style="height: 33%; background: #F48C06; border-radius: 3px 3px 0 0;"></div></div>
+          <div style="display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; height: 100%;"><span style="font: 800 20px/1 var(--display); color: #FFBA08;">18</span><div style="height: 100%; background: #FFBA08; border-radius: 3px 3px 0 0;"></div></div>
+          <div style="display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; height: 100%;"><span style="font: 800 20px/1 var(--display); color: #FFBA08;">14</span><div style="height: 78%; background: #FFBA08; border-radius: 3px 3px 0 0;"></div></div>
+          <div style="display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; height: 100%;"><span style="font: 800 20px/1 var(--display); color: #FFBA08;">11</span><div style="height: 61%; background: #FFBA08; border-radius: 3px 3px 0 0;"></div></div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 16px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #6A040F;">
+          <span class="eyebrow">80&ndash;84</span><span class="eyebrow">85&ndash;89</span><span class="eyebrow">90&ndash;94</span><span class="eyebrow">95&ndash;99</span><span class="eyebrow">100</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- right rail -->
+    <aside style="display: flex; flex-direction: column; gap: 40px; position: sticky; top: 24px;">
+      <div>
+        <h3 class="eyebrow" style="margin: 0 0 16px;">Play on</h3>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <a href="#" class="btn btn--primary" style="justify-content: space-between; width: 100%;"><span>Steam</span><span style="font-family: var(--mono); font-size: 13px;">$59.99</span></a>
+          <a href="#" class="btn btn--ghost" style="justify-content: space-between; width: 100%;"><span>PlayStation Store</span><span style="font-family: var(--mono); font-size: 13px; color: #9A938E;">$69.99</span></a>
+          <a href="#" class="btn btn--ghost" style="justify-content: space-between; width: 100%;"><span>Epic Games</span><span style="font-family: var(--mono); font-size: 13px; color: #9A938E;">$59.99</span></a>
+          <a href="#" class="btn btn--ghost" style="justify-content: space-between; width: 100%;"><span>GOG</span><span style="font-family: var(--mono); font-size: 13px; color: #9A938E;">$59.99</span></a>
+        </div>
+        <p style="font: 400 12px/1.5 var(--body); color: #5A554F; margin: 12px 0 0;">Some links are affiliate links. It costs you nothing and it funds the scoring work.</p>
+      </div>
+
+      <div>
+        <h3 class="eyebrow" style="margin: 0 0 16px;">Guides for this game</h3>
+        <div style="display: flex; flex-direction: column;">
+          <a href="#" style="display: block; padding: 14px 0; border-top: 1px solid #6A040F; font: 700 20px/1.15 var(--display); color: #F5F3F0;">The complete Ashen Trials starter guide</a>
+          <a href="#" style="display: block; padding: 14px 0; border-top: 1px solid #6A040F; font: 700 20px/1.15 var(--display); color: #F5F3F0;">Every Ember Shrine location, in route order</a>
+          <a href="#" style="display: block; padding: 14px 0; border-top: 1px solid #6A040F; font: 700 20px/1.15 var(--display); color: #F5F3F0;">Four builds that carry the back half</a>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="eyebrow" style="margin: 0 0 16px;">Latest news</h3>
+        <div style="display: flex; flex-direction: column;">
+          <a href="#" style="display: block; padding: 14px 0; border-top: 1px solid #6A040F; font: 700 20px/1.15 var(--display); color: #F5F3F0;">Day-one patch trims the Ash Reach difficulty spike</a>
+          <a href="#" style="display: block; padding: 14px 0; border-top: 1px solid #6A040F; font: 700 20px/1.15 var(--display); color: #F5F3F0;">Vault Nine confirms a 2027 expansion</a>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- gallery -->
+  <div style="border-top: 1px solid #6A040F; padding-top: 64px; padding-bottom: 64px;">
+    <div class="shell">
+      <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 28px;">
+        <div>
+          <h2 style="font: 700 40px/1.05 var(--display); letter-spacing: -0.01em; margin: 0;">Media</h2>
+          <p style="font: 400 16px/1.5 var(--body); color: #9A938E; margin: 8px 0 0;">Official key art and screenshots, full resolution, organised by game.</p>
+        </div>
+        <button class="btn btn--primary" style="flex-shrink: 0;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12M7 11l5 5 5-5M4 21h16"></path></svg>
+          Download all in high quality
+        </button>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); grid-template-rows: 260px 200px; gap: 16px;">
+        <div style="grid-column: span 2; grid-row: span 2; border-radius: 6px; overflow: hidden; background: linear-gradient(140deg, #FAA307 0%, #DC2F02 42%, #6A040F 78%, #03071E 100%);"></div>
+        <div style="border-radius: 6px; background: linear-gradient(160deg, #9D0208 0%, #370617 100%);"></div>
+        <div style="border-radius: 6px; background: linear-gradient(200deg, #E85D04 0%, #6A040F 100%);"></div>
+        <div style="border-radius: 6px; background: linear-gradient(30deg, #370617 0%, #D00000 100%);"></div>
+        <div style="border-radius: 6px; background: linear-gradient(300deg, #F48C06 0%, #9D0208 100%);"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- about + facts -->
+  <div style="border-top: 1px solid #6A040F; padding-top: 64px; padding-bottom: 64px;">
+    <div class="shell" style="display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); gap: 64px; align-items: start;">
+      <div>
+        <h2 style="font: 700 40px/1.05 var(--display); letter-spacing: -0.01em; margin: 0 0 20px;">About</h2>
+        <p style="font: 400 18px/1.7 var(--body); color: #F5F3F0; margin: 0 0 20px; max-width: 68ch;">Vault Nine's combat has never been this legible or this cruel. Ashen Trials strips away the map markers, the quest log, and most of the tutorial, then spends forty hours proving it never needed them.</p>
+        <p style="font: 400 18px/1.7 var(--body); color: #9A938E; margin: 0; max-width: 68ch;">The result is the rarest thing in the genre: a game that gets harder and clearer at the same time.</p>
+      </div>
+      <div>
+        <div style="display: flex; justify-content: space-between; gap: 24px; padding: 14px 0; border-bottom: 1px solid #6A040F;"><span class="eyebrow">Studio</span><span style="font: 400 14px/1.5 var(--body);">Vault Nine</span></div>
+        <div style="display: flex; justify-content: space-between; gap: 24px; padding: 14px 0; border-bottom: 1px solid #6A040F;"><span class="eyebrow">Country</span><span style="font: 400 14px/1.5 var(--body);">Mexico</span></div>
+        <div style="display: flex; justify-content: space-between; gap: 24px; padding: 14px 0; border-bottom: 1px solid #6A040F;"><span class="eyebrow">Director</span><span style="font: 400 14px/1.5 var(--body);">Renata Solís</span></div>
+        <div style="display: flex; justify-content: space-between; gap: 24px; padding: 14px 0; border-bottom: 1px solid #6A040F;"><span class="eyebrow">Genre</span><span style="font: 400 14px/1.5 var(--body);">Action RPG</span></div>
+        <div style="display: flex; justify-content: space-between; gap: 24px; padding: 14px 0; border-bottom: 1px solid #6A040F;"><span class="eyebrow">Platforms</span><span style="font: 400 14px/1.5 var(--body);">PC, PS5</span></div>
+        <div style="display: flex; justify-content: space-between; gap: 24px; padding: 14px 0; border-bottom: 1px solid #6A040F;"><span class="eyebrow">Length</span><span style="font: 400 14px/1.5 var(--body);">42 hours</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- more like this -->
+  <div style="border-top: 1px solid #6A040F; padding-top: 64px; padding-bottom: 96px;">
+    <div class="shell">
+      <h2 style="font: 700 40px/1.05 var(--display); letter-spacing: -0.01em; margin: 0 0 28px;">More like this</h2>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 24px;">
+        <div style="background: #370617; border: 1px solid #6A040F; border-radius: 6px; overflow: hidden;">
+          <div style="height: 180px; background: linear-gradient(150deg, #9D0208, #370617);"></div>
+          <div style="padding: 20px; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
+            <div><div style="font: 700 22px/1.15 var(--display);">Hollow Vector</div><div style="font: 500 12px/1.4 var(--body); color: #9A938E; margin-top: 6px;">Roguelike</div></div>
+            <div style="font: 800 32px/0.9 var(--display); color: #FFBA08;">91</div>
+          </div>
+        </div>
+        <div style="background: #370617; border: 1px solid #6A040F; border-radius: 6px; overflow: hidden;">
+          <div style="height: 180px; background: linear-gradient(150deg, #DC2F02, #6A040F);"></div>
+          <div style="padding: 20px; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
+            <div><div style="font: 700 22px/1.15 var(--display);">Marrow Deep</div><div style="font: 500 12px/1.4 var(--body); color: #9A938E; margin-top: 6px;">Action RPG</div></div>
+            <div style="font: 800 32px/0.9 var(--display); color: #F48C06;">84</div>
+          </div>
+        </div>
+        <div style="background: #370617; border: 1px solid #6A040F; border-radius: 6px; overflow: hidden;">
+          <div style="height: 180px; background: linear-gradient(150deg, #E85D04, #370617);"></div>
+          <div style="padding: 20px; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
+            <div><div style="font: 700 22px/1.15 var(--display);">Vellum and Ash</div><div style="font: 500 12px/1.4 var(--body); color: #9A938E; margin-top: 6px;">Tactics</div></div>
+            <div style="font: 800 32px/0.9 var(--display); color: #FFBA08;">88</div>
+          </div>
+        </div>
+        <div style="background: #370617; border: 1px solid #6A040F; border-radius: 6px; overflow: hidden;">
+          <div style="height: 180px; background: linear-gradient(150deg, #6A040F, #03071E);"></div>
+          <div style="padding: 20px; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
+            <div><div style="font: 700 22px/1.15 var(--display);">Quietstone</div><div style="font: 500 12px/1.4 var(--body); color: #9A938E; margin-top: 6px;">Adventure</div></div>
+            <div style="font: 800 32px/0.9 var(--display); color: #F48C06;">79</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

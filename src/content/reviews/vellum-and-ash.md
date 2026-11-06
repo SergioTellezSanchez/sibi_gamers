@@ -8,7 +8,6 @@ platforms: ["PC"]
 genre: "Deckbuilder"
 studio: "Foldtable"
 hours: "50h+"
-sourceCount: 46
 ---
 
 It takes nine hours to show you its actual game, which is both its greatest flaw and its best joke.

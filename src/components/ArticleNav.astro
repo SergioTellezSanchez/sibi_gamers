@@ -1,0 +1,39 @@
+---
+/**
+ * Previous / next within the same collection. Both sides are optional: the
+ * first and last article in a section each render a single card.
+ */
+interface Link {
+  href: string;
+  title: string;
+}
+
+interface Props {
+  prev?: Link;
+  next?: Link;
+}
+
+const { prev, next } = Astro.props;
+---
+
+{
+  (prev || next) && (
+    <nav class="article-nav" aria-label="More in this section">
+      {prev ? (
+        <a class="article-nav__link article-nav__link--prev" href={prev.href}>
+          <span class="article-nav__dir eyebrow">Previous</span>
+          <span class="article-nav__title">{prev.title}</span>
+        </a>
+      ) : (
+        <span />
+      )}
+
+      {next && (
+        <a class="article-nav__link article-nav__link--next" href={next.href}>
+          <span class="article-nav__dir eyebrow">Next</span>
+          <span class="article-nav__title">{next.title}</span>
+        </a>
+      )}
+    </nav>
+  )
+}

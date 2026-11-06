@@ -1,0 +1,69 @@
+---
+import { getCollection, render } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import ArticleShell from "../../components/ArticleShell.astro";
+import Tag from "../../components/Tag.astro";
+
+export async function getStaticPaths() {
+  const all = await getCollection("news");
+  const ordered = all.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+  return ordered.map((entry, i) => ({
+    params: { slug: entry.id },
+    props: { entry, prev: ordered[i - 1], next: ordered[i + 1] },
+  }));
+}
+
+const { entry, prev, next } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "NewsArticle",
+  headline: d.headline,
+  description: d.standfirst,
+  datePublished: d.date.toISOString(),
+  publisher: { "@type": "Organization", name: "Sibi Gamers" },
+  ...(d.byline ? { author: { "@type": "Person", name: d.byline } } : {}),
+};
+---
+
+<Base title={`${d.headline} — Sibi Gamers`} description={d.standfirst} ogType="article">
+  <ArticleShell
+    section="News"
+    sectionHref="/news/"
+    current={d.headline}
+    prev={prev && { href: `/news/${prev.id}/`, title: prev.data.headline }}
+    next={next && { href: `/news/${next.id}/`, title: next.data.headline }}
+  >
+    <header class="article-head article-head--text" slot="header" data-reveal data-reveal-stagger="0.06">
+      <div class="article-head__body">
+        <div class="article-head__tags" data-reveal-item>
+          <Tag tone="accent">{d.category}</Tag>
+          <span class="story__source">{d.source}</span>
+        </div>
+
+        <h1 class="article-head__title" data-reveal-item>{d.headline}</h1>
+        <p class="article-head__standfirst" data-reveal-item>{d.standfirst}</p>
+
+        <div class="article-head__footer" data-reveal-item>
+          <div class="byline">
+            {d.byline && <span class="byline__name">{d.byline}</span>}
+            <span class="byline__date">{d.displayDate}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    <p class="article-source">
+      Reported by <span class="article-source__name">{d.source}</span>.
+    </p>
+  </ArticleShell>
+
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} is:inline />
+</Base>

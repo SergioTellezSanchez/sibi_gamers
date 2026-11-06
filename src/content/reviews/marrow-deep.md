@@ -8,7 +8,6 @@ platforms: ["PS5"]
 genre: "Survival horror"
 studio: "Kettle & Bone"
 hours: "18h"
-sourceCount: 32
 ---
 
 Three quarters of a great survival horror game, and then a boss rush that belongs to something else entirely.

@@ -21,7 +21,11 @@ const reviews = defineCollection({
     genre: z.string(),
     studio: z.string(),
     hours: z.string(),
-    sourceCount: z.number(),
+    /**
+     * No `sourceCount` here on purpose. A review is one critic (see `critic`);
+     * the aggregate belongs to the game and is derived from `src/data/scores.ts`
+     * by slug, so the count can never disagree with the rows behind it.
+     */
     /** Exactly one review may be the lead; it renders as the hero feature. */
     lead: z.boolean().default(false),
   }),

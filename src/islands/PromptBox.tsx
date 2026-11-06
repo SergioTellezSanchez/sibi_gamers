@@ -1,24 +1,49 @@
 import { useEffect, useRef, useState } from "react";
-import { REC_BANK } from "../data/games";
+import { REC_BANK, type Recommendation } from "../data/games";
 import { scoreColor } from "../ds/scoreColor";
+import type { RecommendResponse } from "../lib/recommend";
 
 /**
  * Differentiator from master doc §2: describe a mood, get five picks.
  *
- * The recommendation bank is static for now. When the SSR adapter lands this
- * submits to a `/api/recommend` endpoint backed by the Claude API, and the
- * results shape below is what that endpoint returns.
+ * Submits to `/api/recommend`, the site's one server route. If that route is
+ * unconfigured or unreachable the static bank answers instead, and the
+ * caption says so: a fallback that looks like the real thing is a lie.
  */
+type State =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "done"; picks: Recommendation[]; source: RecommendResponse["source"] };
+
 export default function PromptBox() {
   const [value, setValue] = useState("");
-  const [results, setResults] = useState<typeof REC_BANK | null>(null);
+  const [state, setState] = useState<State>({ status: "idle" });
   const resultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (results) document.dispatchEvent(new CustomEvent("sibi:content"));
-  }, [results]);
+    if (state.status === "done") document.dispatchEvent(new CustomEvent("sibi:content"));
+  }, [state]);
 
-  const submit = () => setResults(REC_BANK);
+  const submit = async () => {
+    const prompt = value.trim();
+    if (prompt.length < 3 || state.status === "loading") return;
+    setState({ status: "loading" });
+
+    try {
+      const res = await fetch("/api/recommend", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
+      if (!res.ok) throw new Error(`recommend ${res.status}`);
+      const data = (await res.json()) as RecommendResponse;
+      setState({ status: "done", picks: data.picks, source: data.source });
+    } catch {
+      setState({ status: "done", picks: REC_BANK, source: "bank" });
+    }
+  };
+
+  const loading = state.status === "loading";
 
   return (
     <section className="promptbox">
@@ -36,29 +61,36 @@ export default function PromptBox() {
             value={value}
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter") submit();
+              if (e.key === "Enter") void submit();
             }}
+            maxLength={300}
             placeholder="e.g. something cozy and slow-paced I can finish in a weekend"
             aria-label="Describe what you want to play"
+            disabled={loading}
           />
-          <button type="button" className="btn btn--primary btn--sm" onClick={submit}>
-            Ask
+          <button
+            type="button"
+            className="btn btn--primary btn--sm"
+            onClick={() => void submit()}
+            disabled={loading}
+            aria-busy={loading}
+          >
+            {loading ? "Thinking" : "Ask"}
           </button>
         </div>
 
-        {results && (
+        {state.status === "done" && (
           <div
             className="promptbox__results"
             ref={resultsRef}
             data-reveal
             data-reveal-stagger="0.06"
+            aria-live="polite"
           >
-            {results.map((rec) => (
-              <div className="rec" key={rec.title} data-reveal-item>
+            {state.picks.map((rec) => (
+              <div className="rec" key={rec.id} data-reveal-item>
                 <div>
-                  {/* Master doc §2: recommendations link to their game pages.
-                      Wire these up once the game detail route exists. */}
-                  <a className="rec__title" href="#">
+                  <a className="rec__title" href={`/games/${rec.id}/`}>
                     {rec.title}
                   </a>
                   <div className="rec__reason">{rec.reason}</div>
@@ -68,6 +100,11 @@ export default function PromptBox() {
                 </div>
               </div>
             ))}
+            {state.source === "bank" && (
+              <p className="promptbox__note">
+                Standing picks: the recommender is not connected yet.
+              </p>
+            )}
           </div>
         )}
       </div>

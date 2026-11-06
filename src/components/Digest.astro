@@ -33,7 +33,7 @@ const reviews = (await getCollection("reviews"))
             />
             <div class="list-item__body">
               <div class="list-item__source">{item.data.source}</div>
-              <a class="list-item__headline" href="/news/">
+              <a class="list-item__headline" href={`/news/${item.id}/`}>
                 {item.data.headline}
               </a>
               <div class="list-item__date">{item.data.displayDate}</div>
@@ -59,7 +59,7 @@ const reviews = (await getCollection("reviews"))
               aria-hidden="true"
             />
             <div class="list-item__body">
-              <a class="list-item__title" href="/reviews/">
+              <a class="list-item__title" href={`/reviews/${item.id}/`}>
                 {item.data.title}
               </a>
               <div class="list-item__excerpt">{item.data.verdict}</div>

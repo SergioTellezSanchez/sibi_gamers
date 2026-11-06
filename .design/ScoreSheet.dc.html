@@ -1,0 +1,253 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders:wght@600;700;800;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    :root {
+      --ink: #03071E; --bordeaux: #370617; --cherry: #6A040F; --oxblood: #9D0208;
+      --ember: #D00000; --ochre: #DC2F02; --cayenne: #E85D04; --saffron: #F48C06;
+      --orange: #FAA307; --amber: #FFBA08; --white: #F5F3F0; --gray: #9A938E;
+      --display: "Big Shoulders", "Arial Narrow", sans-serif;
+      --body: "IBM Plex Sans", -apple-system, "Segoe UI", sans-serif;
+      --mono: "IBM Plex Mono", ui-monospace, monospace;
+    }
+    body { margin: 0; background: var(--ink); color: var(--white); font-family: var(--body); -webkit-font-smoothing: antialiased; }
+    a { color: var(--saffron); text-decoration: none; }
+    a:hover { color: var(--amber); }
+    .shell { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+    .eyebrow { font: 600 12px/1.2 var(--body); text-transform: uppercase; letter-spacing: 0.12em; color: var(--gray); }
+    .tag { display: inline-block; font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 999px; background: var(--bordeaux); color: var(--gray); border: 1px solid var(--cherry); }
+    .tag--accent { background: transparent; color: var(--saffron); border: 1px solid var(--saffron); }
+    .btn { display: inline-flex; align-items: center; gap: 8px; border: none; border-radius: 3px; font-family: var(--body); font-weight: 600; font-size: 14px; padding: 12px 24px; cursor: pointer; }
+    .btn--primary { background: var(--amber); color: var(--ink); }
+    .btn--ink { background: var(--ink); color: var(--amber); }
+    .btn--ghost { background: transparent; color: var(--white); border: 1px solid var(--cherry); }
+    /* the ledger: dense, monospace, three columns of sources */
+    .led { display: grid; grid-template-columns: minmax(0,1fr) 92px 44px; align-items: baseline; gap: 12px; padding: 9px 0; border-bottom: 1px solid #370617; }
+    .led__o { font: 500 13px/1.4 var(--body); color: #F5F3F0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .led__n { font-family: var(--mono); font-size: 11px; color: #5A554F; text-align: right; }
+    .led__v { font: 800 18px/1 var(--display); text-align: right; font-variant-numeric: tabular-nums; }
+  </style>
+</helmet>
+
+<div style="background: #03071E; min-height: 100%; overflow: hidden;">
+
+  <header style="border-bottom: 1px solid #6A040F; background: #03071E; position: relative; z-index: 3;">
+    <div class="shell" style="display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center; gap: 24px; padding-top: 18px; padding-bottom: 18px;">
+      <a href="#" style="display: flex; align-items: center; gap: 10px; justify-self: start;">
+        <svg viewBox="0 0 100 140" width="26" height="26" style="display: block;"><polygon points="50,140 30,120 38,100 22,82 34,64 24,46 40,30 34,14 50,0 66,14 60,30 76,46 66,64 78,82 62,100 70,120 50,140" fill="#FFBA08"></polygon></svg>
+        <span style="font-family: var(--display); font-weight: 800; font-size: 25px; line-height: 1; color: #FFBA08; letter-spacing: 0.01em; text-transform: uppercase;">Sibi Gamers</span>
+      </a>
+      <nav style="display: flex; gap: 40px; justify-self: center;">
+        <span style="font-size: 14px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #9A938E;">Rankings</span>
+        <span style="font-size: 14px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #9A938E;">Reviews</span>
+        <span style="font-size: 14px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #9A938E;">News</span>
+        <span style="font-size: 14px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #9A938E;">Guides</span>
+      </nav>
+      <div style="justify-self: end;">
+        <div style="background: #370617; border: 1px solid #6A040F; border-radius: 3px; padding: 9px 14px; color: #5A554F; font-size: 13px; width: 240px;">Search games, studios, people</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MASTHEAD: the number is the image -->
+  <div style="position: relative; padding-top: 56px; padding-bottom: 8px;">
+    <!-- diagonal ember slab breaking the grid -->
+    <div style="position: absolute; top: -60px; right: -140px; width: 620px; height: 420px; background: linear-gradient(135deg, #DC2F02 0%, #6A040F 62%, #03071E 100%); transform: rotate(-11deg); opacity: 0.5;"></div>
+
+    <div class="shell" style="position: relative;">
+      <div style="display: grid; grid-template-columns: minmax(0, 560px) minmax(0, 1fr); gap: 56px; align-items: start;">
+
+        <!-- the score, enormous, with the distribution built into it -->
+        <div>
+          <div class="eyebrow" style="margin-bottom: 8px;">Sibi Score</div>
+          <div style="font: 900 260px/0.78 var(--display); color: #FFBA08; font-variant-numeric: tabular-nums; letter-spacing: -0.02em;">94</div>
+
+          <!-- distribution ridge, aligned under the number -->
+          <div style="display: flex; align-items: flex-end; gap: 4px; height: 64px; margin-top: 20px;">
+            <div style="flex: 1; height: 11%; background: #F48C06;"></div>
+            <div style="flex: 1; height: 33%; background: #F48C06;"></div>
+            <div style="flex: 1; height: 100%; background: #FFBA08;"></div>
+            <div style="flex: 1; height: 78%; background: #FFBA08;"></div>
+            <div style="flex: 1; height: 61%; background: #FFBA08;"></div>
+          </div>
+          <div style="display: flex; gap: 4px; padding-top: 8px; border-top: 2px solid #FFBA08;">
+            <span class="eyebrow" style="flex: 1; font-size: 10px;">80</span>
+            <span class="eyebrow" style="flex: 1; font-size: 10px;">85</span>
+            <span class="eyebrow" style="flex: 1; font-size: 10px;">90</span>
+            <span class="eyebrow" style="flex: 1; font-size: 10px;">95</span>
+            <span class="eyebrow" style="flex: 1; font-size: 10px;">100</span>
+          </div>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-top: 16px;">
+            <span style="font: 400 14px/1.5 var(--body); color: #9A938E;">51 sources &middot; mean 94 &middot; median 94</span>
+            <a href="#" style="font: 600 12px/1.2 var(--body); text-transform: uppercase; letter-spacing: 0.12em;">Method &rarr;</a>
+          </div>
+        </div>
+
+        <!-- title block -->
+        <div style="padding-top: 28px;">
+          <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 20px;">
+            <span class="tag tag--accent">Action RPG</span>
+            <span class="tag">PC</span>
+            <span class="tag">PS5</span>
+          </div>
+          <h1 style="font: 800 104px/0.86 var(--display); letter-spacing: -0.01em; color: #F5F3F0; margin: 0;">Ashen<br>Trials</h1>
+          <p style="font: 400 22px/1.45 var(--body); color: #F5F3F0; opacity: 0.86; margin: 24px 0 0; max-width: 40ch;">A generational action RPG that trusts you completely.</p>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 20px 32px; margin-top: 36px; font-family: var(--mono); font-size: 13px;">
+            <div style="display: flex; justify-content: space-between; gap: 12px; padding-bottom: 8px; border-bottom: 1px solid #6A040F;"><span style="color: #5A554F;">STUDIO</span><span>Vault Nine</span></div>
+            <div style="display: flex; justify-content: space-between; gap: 12px; padding-bottom: 8px; border-bottom: 1px solid #6A040F;"><span style="color: #5A554F;">RELEASED</span><span>2026-07-28</span></div>
+            <div style="display: flex; justify-content: space-between; gap: 12px; padding-bottom: 8px; border-bottom: 1px solid #6A040F;"><span style="color: #5A554F;">LENGTH</span><span>42h</span></div>
+            <div style="display: flex; justify-content: space-between; gap: 12px; padding-bottom: 8px; border-bottom: 1px solid #6A040F;"><span style="color: #5A554F;">RANK</span><span style="color: #FFBA08;">#1 / 2026</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FULL-BLEED FILMSTRIP: runs off the right edge -->
+  <div style="padding-top: 64px; padding-bottom: 64px;">
+    <div class="shell" style="display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 20px;">
+      <h2 style="font: 700 40px/1.05 var(--display); letter-spacing: -0.01em; margin: 0;">Media</h2>
+      <button class="btn btn--primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12M7 11l5 5 5-5M4 21h16"></path></svg>
+        Download all in high quality
+      </button>
+    </div>
+    <div style="display: flex; gap: 16px; padding-left: max(24px, calc((100% - 1280px) / 2 + 24px));">
+      <div style="flex: 0 0 620px; height: 348px; border-radius: 6px; overflow: hidden;">
+        <svg viewBox="0 0 620 348" preserveAspectRatio="xMidYMid slice" style="display: block; width: 100%; height: 100%;">
+          <defs>
+            <radialGradient id="c1" cx="32%" cy="30%" r="80%">
+              <stop offset="0%" stop-color="#FFBA08"></stop><stop offset="30%" stop-color="#FAA307"></stop>
+              <stop offset="60%" stop-color="#DC2F02"></stop><stop offset="88%" stop-color="#6A040F"></stop><stop offset="100%" stop-color="#03071E"></stop>
+            </radialGradient>
+            <filter id="cgrain"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3"></feTurbulence><feColorMatrix type="saturate" values="0"></feColorMatrix></filter>
+          </defs>
+          <rect width="620" height="348" fill="url(#c1)"></rect>
+          <polygon points="440,348 396,312 414,272 378,238 404,198 382,158 418,126 406,92 440,62 474,92 462,126 498,158 476,198 502,238 466,272 484,312 440,348" fill="#03071E" opacity="0.38"></polygon>
+          <rect width="620" height="348" filter="url(#cgrain)" opacity="0.18"></rect>
+        </svg>
+      </div>
+      <div style="flex: 0 0 420px; height: 348px; border-radius: 6px; background: linear-gradient(160deg, #E85D04, #6A040F 70%, #03071E);"></div>
+      <div style="flex: 0 0 420px; height: 348px; border-radius: 6px; background: linear-gradient(30deg, #9D0208, #370617);"></div>
+      <div style="flex: 0 0 420px; height: 348px; border-radius: 6px; background: linear-gradient(220deg, #F48C06, #6A040F);"></div>
+    </div>
+  </div>
+
+  <!-- THE LEDGER: every source, dense -->
+  <div style="border-top: 1px solid #6A040F; padding-top: 64px; padding-bottom: 64px;">
+    <div class="shell">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 24px;">
+        <h2 style="font: 700 40px/1.05 var(--display); letter-spacing: -0.01em; margin: 0;">The ledger</h2>
+        <span class="eyebrow">All 51 sources &middot; normalized 0&ndash;100</span>
+      </div>
+      <p style="font: 400 16px/1.5 var(--body); color: #9A938E; margin: 8px 0 32px; max-width: 66ch;">No hidden weighting. Every outlet counts once, converted from its own scale to ours by a published rule. Each row links to the original review.</p>
+
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 0 48px;">
+        <div>
+          <div class="led" style="border-bottom-color: #6A040F;"><span class="eyebrow">Outlet</span><span class="eyebrow" style="text-align: right;">Original</span><span class="eyebrow" style="text-align: right;">Norm</span></div>
+          <div class="led"><span class="led__o">IGN</span><span class="led__n">10 / 10</span><span class="led__v" style="color: #FFBA08;">100</span></div>
+          <div class="led"><span class="led__o">Giant Bomb</span><span class="led__n">5 / 5</span><span class="led__v" style="color: #FFBA08;">100</span></div>
+          <div class="led"><span class="led__o">The Guardian</span><span class="led__n">5 / 5</span><span class="led__v" style="color: #FFBA08;">100</span></div>
+          <div class="led"><span class="led__o">VG247</span><span class="led__n">5 / 5</span><span class="led__v" style="color: #FFBA08;">100</span></div>
+          <div class="led"><span class="led__o">Polygon</span><span class="led__n">9.5 / 10</span><span class="led__v" style="color: #FFBA08;">95</span></div>
+          <div class="led"><span class="led__o">Eurogamer</span><span class="led__n">Essential</span><span class="led__v" style="color: #FFBA08;">95</span></div>
+          <div class="led"><span class="led__o">Destructoid</span><span class="led__n">9.5 / 10</span><span class="led__v" style="color: #FFBA08;">95</span></div>
+          <div class="led"><span class="led__o">Ars Technica</span><span class="led__n">A</span><span class="led__v" style="color: #FFBA08;">95</span></div>
+        </div>
+        <div>
+          <div class="led" style="border-bottom-color: #6A040F;"><span class="eyebrow">Outlet</span><span class="eyebrow" style="text-align: right;">Original</span><span class="eyebrow" style="text-align: right;">Norm</span></div>
+          <div class="led"><span class="led__o">PC Gamer</span><span class="led__n">94 / 100</span><span class="led__v" style="color: #FFBA08;">94</span></div>
+          <div class="led"><span class="led__o">Digital Foundry</span><span class="led__n">A</span><span class="led__v" style="color: #FFBA08;">93</span></div>
+          <div class="led"><span class="led__o">Rock Paper Shotgun</span><span class="led__n">Recommended</span><span class="led__v" style="color: #FFBA08;">92</span></div>
+          <div class="led"><span class="led__o">Kotaku</span><span class="led__n">A-</span><span class="led__v" style="color: #FFBA08;">92</span></div>
+          <div class="led"><span class="led__o">Edge</span><span class="led__n">9 / 10</span><span class="led__v" style="color: #FFBA08;">90</span></div>
+          <div class="led"><span class="led__o">GameSpot</span><span class="led__n">9 / 10</span><span class="led__v" style="color: #FFBA08;">90</span></div>
+          <div class="led"><span class="led__o">GamesRadar+</span><span class="led__n">4.5 / 5</span><span class="led__v" style="color: #FFBA08;">90</span></div>
+          <div class="led"><span class="led__o">Push Square</span><span class="led__n">9 / 10</span><span class="led__v" style="color: #FFBA08;">90</span></div>
+        </div>
+        <div>
+          <div class="led" style="border-bottom-color: #6A040F;"><span class="eyebrow">Outlet</span><span class="eyebrow" style="text-align: right;">Original</span><span class="eyebrow" style="text-align: right;">Norm</span></div>
+          <div class="led"><span class="led__o">Shacknews</span><span class="led__n">8.5 / 10</span><span class="led__v" style="color: #F48C06;">85</span></div>
+          <div class="led"><span class="led__o">Game Informer</span><span class="led__n">8.5 / 10</span><span class="led__v" style="color: #F48C06;">85</span></div>
+          <div class="led"><span class="led__o">Hardcore Gamer</span><span class="led__n">4 / 5</span><span class="led__v" style="color: #F48C06;">80</span></div>
+          <div class="led"><span class="led__o">Slant Magazine</span><span class="led__n">4 / 5</span><span class="led__v" style="color: #F48C06;">80</span></div>
+          <div class="led" style="border-bottom: none; padding-top: 18px;"><span class="led__o" style="color: #5A554F;">+ 31 more</span><span class="led__n"></span><span class="led__v" style="color: #5A554F;">&hellip;</span></div>
+          <button class="btn btn--ghost" style="margin-top: 12px; width: 100%; justify-content: center;">Expand full ledger</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUY BAND -->
+  <div style="background: #FFBA08; padding-top: 40px; padding-bottom: 40px;">
+    <div class="shell" style="display: flex; align-items: center; justify-content: space-between; gap: 40px; flex-wrap: wrap;">
+      <div>
+        <div style="font: 800 40px/1 var(--display); color: #03071E;">Play Ashen Trials</div>
+        <div style="font: 400 14px/1.5 var(--body); color: #03071E; opacity: 0.7; margin-top: 6px;">Affiliate links. Free for you, and it funds the scoring work.</div>
+      </div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <a href="#" class="btn btn--ink">Steam &middot; $59.99</a>
+        <a href="#" class="btn btn--ink">PS Store &middot; $69.99</a>
+        <a href="#" class="btn btn--ink">Epic &middot; $59.99</a>
+        <a href="#" class="btn btn--ink">GOG &middot; $59.99</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT / SPEC -->
+  <div style="padding-top: 64px; padding-bottom: 64px;">
+    <div class="shell" style="display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 64px; align-items: start;">
+      <div>
+        <h2 style="font: 700 40px/1.05 var(--display); letter-spacing: -0.01em; margin: 0 0 20px;">About</h2>
+        <p style="font: 400 18px/1.7 var(--body); color: #F5F3F0; margin: 0 0 20px; max-width: 66ch;">Vault Nine's combat has never been this legible or this cruel. Ashen Trials strips away the map markers, the quest log, and most of the tutorial, then spends forty hours proving it never needed them.</p>
+        <p style="font: 400 18px/1.7 var(--body); color: #9A938E; margin: 0; max-width: 66ch;">The result is the rarest thing in the genre: a game that gets harder and clearer at the same time.</p>
+
+        <h3 style="font: 600 28px/1.15 var(--display); margin: 48px 0 16px;">Guides &amp; news</h3>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px;">
+          <a href="#" style="display: block; border-top: 1px solid #6A040F; padding-top: 14px; font: 700 20px/1.15 var(--display); color: #F5F3F0;">The complete Ashen Trials starter guide</a>
+          <a href="#" style="display: block; border-top: 1px solid #6A040F; padding-top: 14px; font: 700 20px/1.15 var(--display); color: #F5F3F0;">Every Ember Shrine location, in route order</a>
+          <a href="#" style="display: block; border-top: 1px solid #6A040F; padding-top: 14px; font: 700 20px/1.15 var(--display); color: #F5F3F0;">Day-one patch trims the Ash Reach spike</a>
+          <a href="#" style="display: block; border-top: 1px solid #6A040F; padding-top: 14px; font: 700 20px/1.15 var(--display); color: #F5F3F0;">Vault Nine confirms a 2027 expansion</a>
+        </div>
+      </div>
+
+      <div style="background: #370617; border: 1px solid #6A040F; border-radius: 6px; padding: 24px;">
+        <div class="eyebrow" style="margin-bottom: 16px;">Spec sheet</div>
+        <div style="font-family: var(--mono); font-size: 13px; line-height: 2.1;">
+          <div style="display: flex; justify-content: space-between; gap: 16px;"><span style="color: #5A554F;">STUDIO</span><span>Vault Nine</span></div>
+          <div style="display: flex; justify-content: space-between; gap: 16px;"><span style="color: #5A554F;">COUNTRY</span><span>Mexico</span></div>
+          <div style="display: flex; justify-content: space-between; gap: 16px;"><span style="color: #5A554F;">DIRECTOR</span><span>Renata Solís</span></div>
+          <div style="display: flex; justify-content: space-between; gap: 16px;"><span style="color: #5A554F;">BUDGET</span><span>Undisclosed</span></div>
+          <div style="display: flex; justify-content: space-between; gap: 16px;"><span style="color: #5A554F;">GENRE</span><span>Action RPG</span></div>
+          <div style="display: flex; justify-content: space-between; gap: 16px;"><span style="color: #5A554F;">PLATFORMS</span><span>PC, PS5</span></div>
+          <div style="display: flex; justify-content: space-between; gap: 16px;"><span style="color: #5A554F;">LENGTH</span><span>42h</span></div>
+          <div style="display: flex; justify-content: space-between; gap: 16px;"><span style="color: #5A554F;">SOURCES</span><span style="color: #FFBA08;">51</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MORE LIKE THIS -->
+  <div style="border-top: 1px solid #6A040F; padding-top: 64px; padding-bottom: 96px;">
+    <div class="shell">
+      <h2 style="font: 700 40px/1.05 var(--display); letter-spacing: -0.01em; margin: 0 0 28px;">More like this</h2>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 24px;">
+        <div><div style="height: 200px; border-radius: 6px; background: linear-gradient(150deg, #9D0208, #370617);"></div><div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-top: 14px; border-top: 1px solid #6A040F; padding-top: 12px;"><span style="font: 700 22px/1.15 var(--display);">Hollow Vector</span><span style="font: 800 28px/0.9 var(--display); color: #FFBA08;">91</span></div></div>
+        <div><div style="height: 200px; border-radius: 6px; background: linear-gradient(150deg, #DC2F02, #6A040F);"></div><div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-top: 14px; border-top: 1px solid #6A040F; padding-top: 12px;"><span style="font: 700 22px/1.15 var(--display);">Marrow Deep</span><span style="font: 800 28px/0.9 var(--display); color: #F48C06;">84</span></div></div>
+        <div><div style="height: 200px; border-radius: 6px; background: linear-gradient(150deg, #E85D04, #370617);"></div><div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-top: 14px; border-top: 1px solid #6A040F; padding-top: 12px;"><span style="font: 700 22px/1.15 var(--display);">Vellum and Ash</span><span style="font: 800 28px/0.9 var(--display); color: #FFBA08;">88</span></div></div>
+        <div><div style="height: 200px; border-radius: 6px; background: linear-gradient(150deg, #6A040F, #03071E);"></div><div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-top: 14px; border-top: 1px solid #6A040F; padding-top: 12px;"><span style="font: 700 22px/1.15 var(--display);">Quietstone</span><span style="font: 800 28px/0.9 var(--display); color: #F48C06;">79</span></div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

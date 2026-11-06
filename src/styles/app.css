@@ -562,6 +562,7 @@ button {
 }
 
 .rank-row {
+  position: relative;
   display: grid;
   grid-template-columns: 44px 96px minmax(160px, 1fr) minmax(280px, 1.5fr) 156px;
   align-items: center;
@@ -807,6 +808,19 @@ button {
   font-weight: 800;
   font-size: 18px;
   flex-shrink: 0;
+}
+
+.promptbox__note {
+  grid-column: 1 / -1;
+  font: var(--text-caption);
+  color: var(--text-disabled);
+  margin: var(--space-2) 0 0;
+}
+
+.promptbox__field input:disabled,
+.promptbox__field .btn:disabled {
+  opacity: 0.6;
+  cursor: progress;
 }
 
 /* ---------- News / reviews columns ---------- */
@@ -1247,12 +1261,15 @@ button {
 
 .review-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  /* min() lets the track collapse below its ideal width on a 320px phone
+     instead of pushing the page sideways. */
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
   gap: var(--space-6);
   margin-bottom: var(--space-16);
 }
 
 .review-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   background: var(--surface-card);
@@ -1375,6 +1392,7 @@ button {
 }
 
 .rail__item {
+  position: relative;
   display: flex;
   gap: var(--space-3);
   align-items: baseline;
@@ -1426,6 +1444,7 @@ button {
 }
 
 .story {
+  position: relative;
   display: flex;
   gap: var(--space-5);
   align-items: flex-start;
@@ -1503,11 +1522,12 @@ button {
 
 .guide-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
   gap: var(--space-6);
 }
 
 .guide-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   background: var(--surface-card);
@@ -1599,6 +1619,7 @@ button {
 }
 
 .chapters__item {
+  position: relative;
   display: flex;
   gap: var(--space-3);
   align-items: baseline;
@@ -1712,11 +1733,909 @@ button {
   border-color: var(--color-amber-flame);
 }
 
+/* ============================================================
+   Article detail pages — Reviews, News, Guides
+   ============================================================ */
+
+/* ---------- Breadcrumb trail ---------- */
+
+.crumbs {
+  padding: var(--space-8) 0 0;
+}
+
+.crumbs__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font: var(--text-caption);
+  color: var(--text-secondary);
+}
+
+.crumbs__item + .crumbs__item::before {
+  content: "/";
+  margin-right: var(--space-2);
+  color: var(--color-black-cherry);
+}
+
+.crumbs__item a {
+  color: var(--text-secondary);
+}
+
+.crumbs__item a:hover {
+  color: var(--color-amber-flame);
+}
+
+/* The current page reads as a label, and truncates rather than wrapping the
+   trail onto a second line on narrow screens. */
+.crumbs__item--current {
+  color: var(--text-primary);
+  max-width: 40ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Article shell ---------- */
+
+.article {
+  padding: var(--space-8) 0 var(--space-12);
+}
+
+/* One reading measure for every section. Full-bleed elements opt out by
+   sitting outside .article__body. */
+.article__body {
+  max-width: 72ch;
+}
+
+/* ---------- Masthead ---------- */
+
+.article-head {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: var(--space-10);
+  align-items: start;
+  padding-bottom: var(--space-10);
+  margin-bottom: var(--space-10);
+  border-bottom: 1px solid var(--border-default);
+}
+
+/* News and guides lead with type, not cover art. */
+.article-head--text {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+}
+
+.article-head__cover {
+  aspect-ratio: 3 / 4;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+}
+
+.article-head__stripe {
+  display: block;
+  height: 6px;
+  width: 120px;
+  border-radius: var(--radius-sm);
+}
+
+.article-head__body {
+  min-width: 0;
+}
+
+.article-head__tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: var(--space-4);
+}
+
+.article-head--text .article-head__tags {
+  margin: var(--space-5) 0 0;
+}
+
+.article-head__title {
+  font: var(--text-h1);
+  color: var(--text-primary);
+  letter-spacing: var(--tracking-tight);
+  margin: 0;
+}
+
+.article-head__standfirst {
+  font: var(--text-body);
+  font-size: 20px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  max-width: 60ch;
+  margin: var(--space-4) 0 0;
+}
+
+.article-head__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-6);
+  margin-top: var(--space-8);
+}
+
+/* ---------- Prose ---------- */
+
+.prose {
+  font: var(--text-body);
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--text-primary);
+}
+
+.prose > * + * {
+  margin-top: var(--space-6);
+}
+
+.prose p {
+  margin: 0;
+}
+
+.prose h2 {
+  font: var(--text-h3);
+  color: var(--text-primary);
+  letter-spacing: var(--tracking-tight);
+  margin: var(--space-12) 0 0;
+}
+
+.prose h3 {
+  font: var(--text-h4);
+  color: var(--text-primary);
+  margin: var(--space-10) 0 0;
+}
+
+.prose a {
+  color: var(--link);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.prose a:hover {
+  color: var(--link-hover);
+}
+
+.prose ul,
+.prose ol {
+  margin: 0;
+  padding-left: var(--space-6);
+}
+
+.prose li + li {
+  margin-top: var(--space-2);
+}
+
+.prose blockquote {
+  margin: var(--space-8) 0;
+  padding: var(--space-2) 0 var(--space-2) var(--space-6);
+  border-left: var(--underline-height) solid var(--color-amber-flame);
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1.25;
+  color: var(--text-primary);
+}
+
+.prose code {
+  font: var(--text-body-sm);
+  font-family: var(--font-mono);
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+}
+
+.prose pre {
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  overflow-x: auto;
+}
+
+.prose pre code {
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+}
+
+.prose hr {
+  border: 0;
+  border-top: 1px solid var(--border-default);
+}
+
+/* ---------- Metadata table (reviews) ---------- */
+
+.facts {
+  margin: var(--space-12) 0 0;
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--border-default);
+  max-width: 72ch;
+}
+
+.facts__row {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: var(--space-4);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.facts__label {
+  font: var(--text-section-header);
+  text-transform: uppercase;
+  letter-spacing: var(--section-header-tracking);
+  color: var(--text-secondary);
+}
+
+.facts__value {
+  font: var(--text-body-sm);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* ---------- Contents list (guides) ---------- */
+
+.contents {
+  margin-bottom: var(--space-10);
+  padding: var(--space-5) var(--space-6);
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+}
+
+.contents__heading {
+  margin: 0 0 var(--space-4);
+}
+
+.contents__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: contents;
+}
+
+.contents__item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-4);
+  padding: var(--space-2) 0;
+}
+
+.contents__num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--color-deep-saffron);
+  min-width: 24px;
+}
+
+.contents__label {
+  font: var(--text-body-sm);
+  color: var(--text-primary);
+}
+
+/* ---------- Source credit (news) ---------- */
+
+.article-source {
+  margin: var(--space-10) 0 0;
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--border-default);
+  font: var(--text-body-sm);
+  color: var(--text-secondary);
+}
+
+.article-source__name {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* ---------- Previous / next ---------- */
+
+.article-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+  padding: var(--space-8) 0 var(--space-16);
+  border-top: 1px solid var(--border-default);
+}
+
+.article-nav__link {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  transition:
+    background var(--motion-fast) var(--ease-out-expo),
+    border-color var(--motion-fast) var(--ease-out-expo);
+}
+
+.article-nav__link:hover {
+  background: var(--surface-card-hover);
+  border-color: var(--color-amber-flame);
+}
+
+/* The "next" card mirrors its sibling so the pair reads outward from centre. */
+.article-nav__link--next {
+  text-align: right;
+  align-items: flex-end;
+}
+
+.article-nav__dir {
+  color: var(--color-deep-saffron);
+}
+
+.article-nav__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1.15;
+  color: var(--text-primary);
+}
+
+.article-nav__link:hover .article-nav__title {
+  color: var(--color-amber-flame);
+}
+
+/* ============================================================
+   Game page — direction A ("Broadsheet") from the design canvas
+   ============================================================ */
+
+.game {
+  padding-bottom: var(--space-12);
+}
+
+.game-section__title {
+  font: var(--text-h2);
+  letter-spacing: var(--tracking-tight);
+  margin: 0;
+}
+
+.game-section__sub {
+  font: var(--text-body);
+  color: var(--text-secondary);
+  margin: var(--space-2) 0 0;
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--action-secondary-text);
+  border: 1px solid var(--action-secondary-border);
+}
+
+.btn--ghost:hover {
+  background: var(--action-secondary-hover-bg);
+}
+
+/* ---------- Hero ----------
+   Key art fills the container rather than the viewport: a true full-bleed
+   element (margin: calc(50% - 50vw)) overshoots by the scrollbar width on
+   every OS that draws one, and this site guarantees no horizontal overflow. */
+
+.game-hero {
+  position: relative;
+  min-height: 460px;
+  display: flex;
+  align-items: flex-end;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-default);
+}
+
+.game-hero__art {
+  position: absolute;
+  inset: 0;
+  /* --cover is one of GRADIENTS; the radial keeps it from reading as a flat
+     fill until IGDB/RAWG art replaces it. */
+  background:
+    linear-gradient(20deg, var(--bg-primary) 0%, transparent 55%, transparent 100%),
+    radial-gradient(72% 72% at 26% 34%, var(--color-orange) 0%, var(--color-red-ochre) 34%, var(--cover) 68%, var(--bg-primary) 100%);
+}
+
+.game-hero__mark {
+  position: absolute;
+  right: 12%;
+  top: -10%;
+  height: 120%;
+  fill: var(--bg-primary);
+  opacity: 0.3;
+}
+
+.game-hero__body {
+  position: relative;
+  padding: var(--space-10) var(--space-8);
+  max-width: 760px;
+}
+
+.game-hero__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: var(--space-4);
+}
+
+.game-hero__title {
+  font: var(--text-h1);
+  font-size: clamp(56px, 9vw, 132px);
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.game-hero__standfirst {
+  font: var(--text-body);
+  font-size: 22px;
+  line-height: 1.4;
+  color: var(--text-primary);
+  margin: var(--space-4) 0 0;
+  max-width: 56ch;
+}
+
+/* ---------- Score strip ---------- */
+
+.game-strip {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-8) 0;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.game-strip__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-10);
+  margin: 0;
+}
+
+.game-strip__fact dd {
+  font: var(--text-h4);
+  color: var(--text-primary);
+  margin: var(--space-2) 0 0;
+}
+
+.game-strip__how {
+  align-self: center;
+}
+
+/* ---------- Two columns: breakdown + rail ---------- */
+
+.game-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: var(--space-16);
+  padding: var(--space-12) 0 var(--space-16);
+  border-bottom: 1px solid var(--border-default);
+  align-items: start;
+}
+
+.game-sources__head {
+  align-items: baseline;
+  margin-bottom: var(--space-2);
+}
+
+.game-sources__title {
+  font: var(--text-h2);
+  letter-spacing: var(--tracking-tight);
+  margin: 0;
+}
+
+.game-sources__intro,
+.game-sources__empty {
+  font: var(--text-body);
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-8);
+  max-width: 60ch;
+}
+
+.game-sources__note {
+  font: var(--text-body-sm);
+  color: var(--color-deep-saffron);
+  border-left: var(--underline-height) solid var(--color-deep-saffron);
+  padding-left: var(--space-4);
+  margin: 0 0 var(--space-6);
+}
+
+.srcrow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 92px 92px 28px;
+  align-items: center;
+  gap: var(--space-5);
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border-default);
+  color: var(--text-primary);
+}
+
+.srcrow--head {
+  padding-top: 0;
+}
+
+a.srcrow:hover {
+  color: var(--text-primary);
+  background: var(--surface-card);
+}
+
+a.srcrow:hover .srcrow__outlet {
+  color: var(--color-amber-flame);
+}
+
+.srcrow__outlet {
+  font: var(--text-body);
+  font-weight: 500;
+  transition: color var(--motion-fast) var(--ease-out-expo);
+}
+
+.srcrow__num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.srcrow__native {
+  font: var(--text-body-sm);
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+}
+
+.srcrow__score {
+  font: var(--text-score-row);
+  font-size: 22px;
+}
+
+.srcrow__ext {
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* The "show all" toggle is a native <details>: every row is in the HTML and
+   nothing hydrates (ARCHITECTURE.md §12, invariants 1 and 2). */
+.game-sources__more {
+  margin-top: var(--space-6);
+}
+
+.game-sources__more summary {
+  list-style: none;
+  width: fit-content;
+}
+
+.game-sources__more summary::-webkit-details-marker {
+  display: none;
+}
+
+.game-sources__more[open] summary {
+  display: none;
+}
+
+/* ---------- Histogram ---------- */
+
+.histogram {
+  margin-top: var(--space-16);
+}
+
+.histogram__title {
+  font: var(--text-h3);
+  margin: 0 0 var(--space-1);
+}
+
+.histogram__sub {
+  font: var(--text-body-sm);
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-8);
+}
+
+.histogram__bars,
+.histogram__labels {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+.histogram__bars {
+  align-items: end;
+  height: 180px;
+}
+
+.histogram__col {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 10px;
+  height: 100%;
+}
+
+.histogram__count {
+  font: var(--text-score-row);
+  color: currentColor;
+}
+
+.histogram__bar {
+  display: block;
+  background: currentColor;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  min-height: 2px;
+}
+
+.histogram__labels {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-default);
+}
+
+/* ---------- Rail ---------- */
+
+.game-rail {
+  position: sticky;
+  top: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+}
+
+.game-rail__title {
+  margin: 0 0 var(--space-4);
+}
+
+.game-rail__stores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.game-rail__fine {
+  font: var(--text-caption);
+  color: var(--text-disabled);
+  margin: var(--space-3) 0 0;
+}
+
+.game-rail__link {
+  display: block;
+  padding: 14px 0;
+  border-top: 1px solid var(--border-default);
+  font: var(--text-h4);
+  color: var(--text-primary);
+}
+
+.game-rail__link:hover {
+  color: var(--color-amber-flame);
+}
+
+.game-rail__sub {
+  display: block;
+  font: var(--text-caption);
+  color: var(--text-secondary);
+  margin-top: var(--space-1);
+}
+
+/* ---------- Media ---------- */
+
+.game-media {
+  padding: var(--space-16) 0;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.game-media .section-head {
+  align-items: flex-end;
+  margin-bottom: var(--space-8);
+}
+
+/* Key art at twice the size of the four screenshots beside it. */
+.game-media__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: 180px;
+  gap: var(--space-4);
+}
+
+.game-media__tile {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+}
+
+.game-media__tile:first-child {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+/* ---------- About ---------- */
+
+.game-about {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: var(--space-16);
+  padding: var(--space-16) 0;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.game-about__text {
+  font: var(--text-body);
+  font-size: 18px;
+  line-height: 1.7;
+  margin: var(--space-6) 0 0;
+  max-width: 60ch;
+}
+
+.game-facts {
+  margin: 0;
+}
+
+.game-facts__row {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: var(--space-4);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.game-facts__row dd {
+  font: var(--text-body-sm);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* ---------- More like this ---------- */
+
+.game-related {
+  padding-top: var(--space-16);
+}
+
+.game-related__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+  gap: var(--space-6);
+  margin-top: var(--space-8);
+}
+
+.game-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  color: var(--text-primary);
+  transition:
+    border-color var(--motion-fast) var(--ease-out-expo),
+    background var(--motion-fast) var(--ease-out-expo);
+}
+
+.game-card:hover {
+  background: var(--surface-card-hover);
+  border-color: var(--color-amber-flame);
+  color: var(--text-primary);
+}
+
+.game-card__cover {
+  display: block;
+  height: 140px;
+}
+
+.game-card__body {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+}
+
+.game-card__title {
+  display: block;
+  font: var(--text-h4);
+}
+
+.game-card:hover .game-card__title {
+  color: var(--color-amber-flame);
+}
+
+.game-card__genre {
+  display: block;
+  font: var(--text-caption);
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.game-card__score {
+  font: var(--text-score-card);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Reviews point at the game page that holds their sources. */
+.article-crosslink {
+  margin: var(--space-8) 0 0;
+  font: var(--text-body);
+  font-weight: 600;
+}
+
+/* ---------- Game page responsive ---------- */
+
+@media (max-width: 1100px) {
+  .game-main {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-12);
+  }
+
+  .game-rail {
+    position: static;
+  }
+
+  .game-about {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-8);
+  }
+}
+
+@media (max-width: 860px) {
+  .game-hero {
+    min-height: 340px;
+  }
+
+  .game-hero__body {
+    padding: var(--space-8) var(--space-5);
+  }
+
+  .game-strip {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-6);
+  }
+
+  .game-strip__facts {
+    gap: var(--space-6);
+  }
+
+  .game-media__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: 140px;
+  }
+
+  .game-media__tile:first-child {
+    grid-row: span 1;
+  }
+
+  .game-media .section-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .srcrow {
+    grid-template-columns: minmax(0, 1fr) 64px 48px 20px;
+    gap: var(--space-3);
+  }
+
+  .game-sources__title,
+  .game-section__title {
+    font: var(--text-h3);
+  }
+
+  .histogram__bars {
+    height: 120px;
+  }
+}
+
 /* ---------- Responsive ---------- */
 
 @media (max-width: 1100px) {
   .hero-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-8);
   }
 
@@ -1735,7 +2654,7 @@ button {
   }
 
   .cols {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--space-8);
   }
 
@@ -1749,7 +2668,7 @@ button {
   }
 
   .with-rail {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--space-10);
   }
 
@@ -1759,17 +2678,49 @@ button {
 }
 
 @media (max-width: 860px) {
+  .article-head {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-6);
+  }
+
+  /* A 3:4 portrait plate would push the headline off-screen; cap it. */
+  .article-head__cover {
+    aspect-ratio: 16 / 9;
+    max-height: 220px;
+  }
+
+  .article-head__title {
+    font: var(--text-h2);
+  }
+
+  .article-head__standfirst {
+    font-size: 18px;
+  }
+
   .nav__inner {
     grid-template-columns: 1fr auto;
     row-gap: var(--space-4);
   }
 
   .nav__links {
+    /* `justify-self: start` sizes a grid item to its own content, so the strip
+       grew past its track and took the page with it. Stretching binds it to the
+       track and lets overflow-x actually scroll. */
+    min-width: 0;
     order: 3;
     grid-column: 1 / -1;
-    justify-self: start;
+    justify-self: stretch;
     gap: var(--space-6);
     overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .nav__links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-item {
+    flex-shrink: 0;
   }
 
   .nav__search {
@@ -1816,6 +2767,25 @@ button {
 }
 
 @media (max-width: 640px) {
+  /* Stacked prev/next: both cards align left so they read as one list. */
+  .article-nav {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .article-nav__link--next {
+    text-align: left;
+    align-items: flex-start;
+  }
+
+  .facts__row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-1);
+  }
+
+  .prose {
+    font-size: 17px;
+  }
+
   .rank-row {
     grid-template-columns: 32px 64px minmax(0, 1fr);
     padding: var(--space-4) var(--space-2);
@@ -1841,6 +2811,114 @@ button {
 
   .footer__cols {
     gap: var(--space-8);
+  }
+}
+
+/* ---------- Tablet: one more step before the hero stacks ---------- */
+
+@media (max-width: 720px) {
+  .hero-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- Landscape phones ----------
+   A sticky bar costs a fifth of a 390px-tall viewport. Let it scroll away. */
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .nav {
+    position: static;
+  }
+}
+
+/* ---------- Touch input ----------
+   Keyed to the pointer, not the width: a 1024px tablet needs 44px targets and a
+   1024px laptop does not. Hit areas grow; the visual design does not move. */
+
+@media (pointer: coarse) {
+  .nav-item::after {
+    content: "";
+    position: absolute;
+    inset: -13px -10px;
+  }
+
+  .nav__brand {
+    padding: 9px 0;
+  }
+
+  .pill {
+    padding: 13px 18px;
+  }
+
+  .nav__search input {
+    padding: 13px 14px;
+  }
+
+  .footer__link {
+    padding: 12px 0;
+    margin-top: 0;
+  }
+
+  .eyebrow--link {
+    display: inline-block;
+    padding: 15px 0;
+  }
+
+  .crumbs__item a {
+    display: inline-block;
+    padding: 14px 0;
+  }
+
+  .lead__title a {
+    display: inline-block;
+    padding: 6px 0;
+  }
+
+  /* Icon buttons and small controls get a real 44px box. */
+  .footer__social {
+    width: 44px;
+    height: 44px;
+  }
+
+  .btn {
+    min-height: 44px;
+  }
+
+  /* Numbered list rows: the row is the target, not just the text on it. */
+  .rail__link::after,
+  .chapters__link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  /* The whole card becomes the target instead of the title line alone. Scoped
+     to touch so pointer users keep normal text selection inside a card. */
+  .review-card__title a::after,
+  .guide-card__title a::after,
+  .story__headline a::after,
+  .hero-card__title::after,
+  .rank-row__title a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+}
+
+/* ---------- Large displays ----------
+   The container is capped for readability, not for lack of room. Above 1600px
+   let the grids and the ranking table use the width. Prose is unaffected: it is
+   held at its own measure by .article__body and .page-header__subtitle. */
+
+@media (min-width: 1600px) {
+  :root {
+    --container-max: 1440px;
+  }
+}
+
+@media (min-width: 2100px) {
+  :root {
+    --container-max: 1560px;
   }
 }
 

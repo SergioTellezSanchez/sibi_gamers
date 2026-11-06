@@ -8,7 +8,6 @@ platforms: ["PC"]
 genre: "RTS"
 studio: "Anvil Grade"
 hours: "30h"
-sourceCount: 36
 ---
 
 Competent in every direction and daring in none — an RTS built entirely from other RTSs.

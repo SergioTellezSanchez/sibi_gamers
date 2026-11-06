@@ -3,6 +3,7 @@ import { GRADIENTS } from "../data/games";
 import { scoreColor, scoreBand } from "../ds/scoreColor";
 
 interface Props {
+  href: string;
   title: string;
   score: number;
   verdict: string;
@@ -14,7 +15,7 @@ interface Props {
   index: number;
 }
 
-const { title, score, verdict, excerpt, critic, date, genre, platforms, index } =
+const { href, title, score, verdict, excerpt, critic, date, genre, platforms, index } =
   Astro.props;
 ---
 
@@ -34,7 +35,7 @@ const { title, score, verdict, excerpt, critic, date, genre, platforms, index } 
   <div class="review-card__body">
     <div class="review-card__top">
       <div>
-        <h3 class="review-card__title"><a href="#">{title}</a></h3>
+        <h3 class="review-card__title"><a href={href}>{title}</a></h3>
         <div class="review-card__meta">{genre} · {platforms.join(" · ")}</div>
       </div>
       <div class="review-card__score" style={`color:${scoreColor(score)}`}>

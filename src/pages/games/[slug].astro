@@ -1,0 +1,353 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import Breadcrumb from "../../components/Breadcrumb.astro";
+import ScoreDisplay from "../../components/ScoreDisplay.astro";
+import Tag from "../../components/Tag.astro";
+import { scoreColor } from "../../ds/scoreColor";
+import { MIN_SOURCES } from "../../lib/score";
+import {
+  CURRENT_YEAR,
+  GAMES,
+  GRADIENTS,
+  STOREFRONTS,
+  getYearData,
+  relatedGames,
+  scoreFor,
+} from "../../data/games";
+
+/**
+ * The game page: direction A ("Broadsheet") from the design canvas. This is
+ * the revenue page and the one the aggregate lives on, so it is the one place
+ * where every number must trace back to a row.
+ */
+export function getStaticPaths() {
+  return GAMES.map((game) => ({ params: { slug: game.id }, props: { game } }));
+}
+
+const { game } = Astro.props;
+const { rows, aggregate: agg } = scoreFor(game.id);
+
+// The catalogue's hand-picked score is what the homepage prints. Where rows
+// exist the two must agree (score.test.ts pins it); where they do not, the
+// number is shown without a source caption, same as the ranking.
+const score = agg.published ? agg.mean : game.score;
+
+const { topGames, rankedGames } = getYearData(CURRENT_YEAR);
+const rank = [...topGames, ...rankedGames].find((g) => g.id === game.id)?.rank;
+
+const review = (await getCollection("reviews")).find((r) => r.data.title === game.title);
+const guides = (await getCollection("guides"))
+  .filter((g) => g.data.game === game.title)
+  .sort((a, b) => a.data.order - b.data.order);
+// News has no game field; the headline naming the game is the join.
+const news = (await getCollection("news"))
+  .filter((n) => n.data.headline.includes(game.title))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+
+const standfirst = review?.data.verdict ?? game.blurb.split(". ")[0];
+
+// Highest first; ties by outlet name so the order is stable across builds.
+const sorted = [...rows].sort(
+  (a, b) => b.normalized - a.normalized || a.outlet.name.localeCompare(b.outlet.name),
+);
+const SHOWN = 12;
+const visible = sorted.slice(0, SHOWN);
+const rest = sorted.slice(SHOWN);
+const maxBucket = Math.max(1, ...agg.distribution.map((b) => b.count));
+
+const index = GAMES.findIndex((g) => g.id === game.id);
+const cover = GRADIENTS[index % GRADIENTS.length];
+const stores = STOREFRONTS[index % STOREFRONTS.length];
+const related = relatedGames(game);
+
+const released = new Date(game.released).toLocaleDateString("en-GB", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+});
+
+const facts = [
+  ["Studio", game.studio],
+  ["Country", game.country],
+  ["Director", game.director],
+  ["Genre", game.genre],
+  ["Platforms", game.platforms.join(", ")],
+  ["Length", game.length],
+  ["Budget", game.budget],
+];
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  name: game.title,
+  gamePlatform: game.platforms,
+  genre: game.genre,
+  datePublished: game.released,
+  author: { "@type": "Organization", name: game.studio },
+  ...(agg.published && {
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: agg.mean,
+      ratingCount: agg.count,
+      bestRating: 100,
+      worstRating: 0,
+    },
+  }),
+};
+---
+
+<Base
+  title={`${game.title} — score, sources and where to play — Sibi Gamers`}
+  description={agg.published
+    ? `${game.title} scores ${agg.mean} on Sibi Gamers, based on ${agg.count} sources. ${standfirst}.`
+    : `${game.title} by ${game.studio}. ${standfirst}.`}
+>
+  <Breadcrumb section="Rankings" sectionHref="/" current={game.title} />
+
+  <article class="game">
+    <header class="game-hero" data-reveal data-reveal-stagger="0.08">
+      <div class="game-hero__art" style={`--cover:${cover}`} aria-hidden="true">
+        <svg viewBox="0 0 100 140" class="game-hero__mark">
+          <polygon points="50,140 30,120 38,100 22,82 34,64 24,46 40,30 34,14 50,0 66,14 60,30 76,46 66,64 78,82 62,100 70,120 50,140" />
+        </svg>
+      </div>
+
+      <div class="game-hero__body">
+        <div class="game-hero__tags" data-reveal-item>
+          <Tag tone="accent">{game.genre}</Tag>
+          {game.platforms.map((p) => <Tag>{p}</Tag>)}
+        </div>
+        <h1 class="game-hero__title" data-reveal-item>{game.title}</h1>
+        <p class="game-hero__standfirst" data-reveal-item>{standfirst}</p>
+      </div>
+    </header>
+
+    <div class="game-strip" data-reveal data-reveal-stagger="0.05">
+      <div class="game-strip__score" data-reveal-item>
+        <ScoreDisplay score={score} size="hero" sourceCount={agg.published ? agg.count : undefined} />
+      </div>
+
+      <dl class="game-strip__facts">
+        <div class="game-strip__fact" data-reveal-item>
+          <dt class="eyebrow">Studio</dt><dd>{game.studio}</dd>
+        </div>
+        <div class="game-strip__fact" data-reveal-item>
+          <dt class="eyebrow">Released</dt><dd>{released}</dd>
+        </div>
+        <div class="game-strip__fact" data-reveal-item>
+          <dt class="eyebrow">Length</dt><dd>{game.length}</dd>
+        </div>
+        {rank && (
+          <div class="game-strip__fact" data-reveal-item>
+            <dt class="eyebrow">Rank this year</dt><dd>#{rank} of {CURRENT_YEAR}</dd>
+          </div>
+        )}
+      </dl>
+
+      <a class="eyebrow eyebrow--link game-strip__how" href="/how-we-score/" data-reveal-item>
+        How we score &rarr;
+      </a>
+    </div>
+
+    <div class="game-main">
+      <section class="game-sources" aria-labelledby="sources-title">
+        <div class="section-head game-sources__head">
+          <h2 class="game-sources__title" id="sources-title">Score breakdown</h2>
+          {rows.length > 0 && (
+            <span class="eyebrow">Showing {Math.min(SHOWN, rows.length)} of {rows.length}</span>
+          )}
+        </div>
+
+        {rows.length === 0 ? (
+          <p class="game-sources__empty">
+            We have not collected any sources for {game.title} yet. The number above is
+            an editorial score, not an aggregate, and it will be replaced the moment
+            {" "}{MIN_SOURCES} outlets are on file.
+          </p>
+        ) : (
+          <>
+            <p class="game-sources__intro">
+              Every source we counted, its score in its own format, and what that becomes
+              on our 0&ndash;100 scale. Every row links to the original review.
+            </p>
+
+            {!agg.published && (
+              <p class="game-sources__note">
+                Fewer than {MIN_SOURCES} sources on file, so no aggregate is published
+                yet. The number above is an editorial score.
+              </p>
+            )}
+
+            <div class="srcrows" data-reveal data-reveal-stagger="0.03">
+              <div class="srcrow srcrow--head" aria-hidden="true">
+                <span class="eyebrow">Outlet</span>
+                <span class="eyebrow srcrow__num">Original</span>
+                <span class="eyebrow srcrow__num">Normalized</span>
+                <span></span>
+              </div>
+              {visible.map((row) => (
+                <a
+                  class="srcrow"
+                  href={row.reviewUrl}
+                  rel="noopener nofollow"
+                  target="_blank"
+                  data-reveal-item
+                >
+                  <span class="srcrow__outlet">{row.outlet.name}</span>
+                  <span class="srcrow__num srcrow__native">{row.native}</span>
+                  <span class="srcrow__num srcrow__score" style={`color:${scoreColor(row.normalized)}`}>
+                    {row.normalized}
+                  </span>
+                  <span class="srcrow__ext" aria-hidden="true">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M7 17 17 7M9 7h8v8" />
+                    </svg>
+                  </span>
+                </a>
+              ))}
+            </div>
+
+            {rest.length > 0 && (
+              <details class="game-sources__more">
+                <summary class="btn btn--ghost btn--md">Show all {rows.length} sources</summary>
+                <div class="srcrows">
+                  {rest.map((row) => (
+                    <a class="srcrow" href={row.reviewUrl} rel="noopener nofollow" target="_blank">
+                      <span class="srcrow__outlet">{row.outlet.name}</span>
+                      <span class="srcrow__num srcrow__native">{row.native}</span>
+                      <span class="srcrow__num srcrow__score" style={`color:${scoreColor(row.normalized)}`}>
+                        {row.normalized}
+                      </span>
+                      <span class="srcrow__ext" aria-hidden="true">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M7 17 17 7M9 7h8v8" />
+                        </svg>
+                      </span>
+                    </a>
+                  ))}
+                </div>
+              </details>
+            )}
+
+            {agg.published && (
+              <div class="histogram" data-reveal>
+                <h3 class="histogram__title">Distribution</h3>
+                <p class="histogram__sub">
+                  Where the {agg.count} sources landed. Mean {agg.mean}, median {agg.median}.
+                </p>
+                <div class="histogram__bars" role="img" aria-label={agg.distribution.map((b) => `${b.label}: ${b.count}`).join(", ")}>
+                  {agg.distribution.map((b) => (
+                    <div class="histogram__col" style={`color:${scoreColor(b.min)}`}>
+                      <span class="histogram__count">{b.count}</span>
+                      <span class="histogram__bar" style={`height:${Math.round((b.count / maxBucket) * 100)}%`}></span>
+                    </div>
+                  ))}
+                </div>
+                <div class="histogram__labels" aria-hidden="true">
+                  {agg.distribution.map((b) => <span class="eyebrow">{b.label}</span>)}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </section>
+
+      <aside class="game-rail">
+        <section class="game-rail__block">
+          <h2 class="eyebrow game-rail__title">Play on</h2>
+          <div class="game-rail__stores">
+            {stores.map((s) => <Tag tone="accent">{s}</Tag>)}
+          </div>
+          <p class="game-rail__fine">Store links and prices arrive with the affiliate programme.</p>
+        </section>
+
+        {review && (
+          <section class="game-rail__block">
+            <h2 class="eyebrow game-rail__title">Our review</h2>
+            <a class="game-rail__link" href={`/reviews/${review.id}/`}>
+              {review.data.verdict}
+              <span class="game-rail__sub">{review.data.critic}</span>
+            </a>
+          </section>
+        )}
+
+        {guides.length > 0 && (
+          <section class="game-rail__block">
+            <h2 class="eyebrow game-rail__title">Guides for this game</h2>
+            {guides.map((g) => (
+              <a class="game-rail__link" href={`/guides/${g.id}/`}>{g.data.title}</a>
+            ))}
+          </section>
+        )}
+
+        {news.length > 0 && (
+          <section class="game-rail__block">
+            <h2 class="eyebrow game-rail__title">Latest news</h2>
+            {news.map((n) => (
+              <a class="game-rail__link" href={`/news/${n.id}/`}>{n.data.headline}</a>
+            ))}
+          </section>
+        )}
+      </aside>
+    </div>
+
+    <section class="game-media" data-reveal data-reveal-stagger="0.05" aria-labelledby="media-title">
+      <div class="section-head">
+        <div>
+          <h2 class="game-section__title" id="media-title">Media</h2>
+          <p class="game-section__sub">Official key art and screenshots, full resolution.</p>
+        </div>
+        <button type="button" class="btn btn--primary btn--md" data-reveal-item>
+          Download all in high quality
+        </button>
+      </div>
+      <div class="game-media__grid">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <div
+            class="game-media__tile"
+            style={`background:${GRADIENTS[(index + i) % GRADIENTS.length]}`}
+            data-reveal-item
+            aria-hidden="true"
+          ></div>
+        ))}
+      </div>
+    </section>
+
+    <section class="game-about" data-reveal data-reveal-stagger="0.04" aria-labelledby="about-title">
+      <div class="game-about__copy">
+        <h2 class="game-section__title" id="about-title">About</h2>
+        <p class="game-about__text" data-reveal-item>{game.blurb}</p>
+      </div>
+      <dl class="game-facts">
+        {facts.map(([label, value]) => (
+          <div class="game-facts__row" data-reveal-item>
+            <dt class="eyebrow">{label}</dt>
+            <dd>{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+
+    <section class="game-related" data-reveal data-reveal-stagger="0.06" aria-labelledby="related-title">
+      <h2 class="game-section__title" id="related-title">More like this</h2>
+      <div class="game-related__grid">
+        {related.map((g, i) => (
+          <a class="game-card" href={`/games/${g.id}/`} data-reveal-item data-hover-lift>
+            <span class="game-card__cover" style={`background:${GRADIENTS[(index + i + 1) % GRADIENTS.length]}`} aria-hidden="true"></span>
+            <span class="game-card__body">
+              <span>
+                <span class="game-card__title">{g.title}</span>
+                <span class="game-card__genre">{g.genre}</span>
+              </span>
+              <span class="game-card__score" style={`color:${scoreColor(g.score)}`}>{g.score}</span>
+            </span>
+          </a>
+        ))}
+      </div>
+    </section>
+  </article>
+
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} is:inline />
+</Base>
